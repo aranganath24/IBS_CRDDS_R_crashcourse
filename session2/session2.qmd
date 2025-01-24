@@ -1,0 +1,22 @@
+---
+title: "R Foundations: Functions and Iteration"
+author: "Aditya Ranganath"
+format: 
+  html:
+    toc: true 
+    toc-depth: 2
+    toc-expand: 2
+    number-sections: true
+    number-depth: 3
+editor: visual
+---
+
+# Built-In Functions
+
+# Packages
+
+# Writing Custom Functions
+
+# Iteration
+
+# Global and Local Environments
