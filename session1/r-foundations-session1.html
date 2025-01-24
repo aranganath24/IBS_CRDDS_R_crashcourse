@@ -83,7 +83,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#r-and-r-studio-installation" id="toc-r-and-r-studio-installation" class="nav-link active" data-scroll-target="#r-and-r-studio-installation"><span class="header-section-number">1</span> R and R Studio Installation</a></li>
   <li><a href="#the-r-studio-interface" id="toc-the-r-studio-interface" class="nav-link" data-scroll-target="#the-r-studio-interface"><span class="header-section-number">2</span> The R Studio Interface</a></li>
   <li><a href="#r-as-a-calculator" id="toc-r-as-a-calculator" class="nav-link" data-scroll-target="#r-as-a-calculator"><span class="header-section-number">3</span> R as a Calculator</a></li>
-  <li><a href="#object-assignment-and-manipulation" id="toc-object-assignment-and-manipulation" class="nav-link" data-scroll-target="#object-assignment-and-manipulation"><span class="header-section-number">4</span> Object Assignment and Manipulation</a></li>
+  <li><a href="#object-assignment-and-manipulation" id="toc-object-assignment-and-manipulation" class="nav-link" data-scroll-target="#object-assignment-and-manipulation"><span class="header-section-number">4</span> Object Assignment and Manipulation</a>
+  <ul class="collapse">
+  <li><a href="#naming-objects" id="toc-naming-objects" class="nav-link" data-scroll-target="#naming-objects"><span class="header-section-number">4.1</span> Naming Objects</a></li>
+  </ul></li>
   <li><a href="#data-structures" id="toc-data-structures" class="nav-link" data-scroll-target="#data-structures"><span class="header-section-number">5</span> Data Structures</a>
   <ul class="collapse">
   <li><a href="#vectors" id="toc-vectors" class="nav-link" data-scroll-target="#vectors"><span class="header-section-number">5.1</span> Vectors</a></li>
@@ -224,11 +227,165 @@ Figure&nbsp;2: Starting an R Studio Script
 <section id="object-assignment-and-manipulation" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Object Assignment and Manipulation</h1>
 <p>The concept of object (or variable) assignment is a fundamental concept when working in a scripting environment; indeed, the ability to easily assign values to objects is what allows us to easily and intuitively manipulate and process our data in a programmatic setting. To better understand the mechanics of object assignment, consider the following:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assign value 5 to new object named x</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>x<span class="ot">&lt;-</span><span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In the code above, we use R’s assignment operator, <code>&lt;-</code> (i.e.&nbsp;a left-pointing arrow) to assign the value 5 to an object named <code>x</code>. Now that an object named <code>x</code> has been created and assigned the value 5, printing <code>x</code> in our console (or printing <code>x</code> in our script and running it) will return the value that has been assigned to the <code>x</code> object, i.e.&nbsp;5:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value assigned to "x"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5</code></pre>
+</div>
+</div>
+<p>More generally, the process of assignment effectively equates the output created by the code on the right side of the assignment operator (<code>&lt;-</code>) to an object with a name that is specified on the left side of the assignment operator. Whenever we want to look at the contents assigned to an object (i.e.&nbsp;the output created by the code to the right side of the assignment operator), we simply print the name of the object in the R console (or print the name and run it within a script).</p>
+<p>Let’s create another object, named <code>y</code>, and assign it the value “12”:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assign value 12 to new object named y</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>y<span class="ot">&lt;-</span><span class="dv">12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As we noted above, we can print the value that was assigned to <code>y</code> by printing the name of the object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value assigned to "y"</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 12</code></pre>
+</div>
+</div>
+<p>Once objects are defined, it’s possible to use those objects in arithmetic operations. For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints the value of x + y</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>x<span class="sc">+</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 17</code></pre>
+</div>
+</div>
+<p>It’s also possible to use existing objects to assign values to new ones. For example, we can assign the sum of <code>x</code> and <code>y</code> to a new object that we’ll name <code>xy_sum</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># creates a new object, named "xy_sum" whose value is the sum of "x" and "y"</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>xy_sum<span class="ot">&lt;-</span>x<span class="sc">+</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, let’s print the value of <code>xy_sum</code>that was created by the previous assignment operation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value of of "xy_sum"</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>xy_sum</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 17</code></pre>
+</div>
+</div>
+<p>As expected, we see that the value assigned to <code>xy_sum</code> is “17” (i.e.&nbsp;the sum of the values assigned to <code>x</code> and <code>y</code>).</p>
+<p>It is possible to change the value assigned to a given object. For example, let’s say we want to change the value assigned to <code>x</code> from “5” to “8”:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assign value of "8" to object named "x"</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>x<span class="ot">&lt;-</span><span class="dv">8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can confirm that <code>x</code> is now associated with the value “8”, and the old value has been overwritten:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints updated value of "x"</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8</code></pre>
+</div>
+</div>
+<p>It’s worth noting that updating the value assigned to <code>x</code> will not automatically update the value assigned to <code>xy_sum</code> (which, recall, is the sum of <code>x</code> and <code>y</code>). If we print the value assigned to <code>xy_sum</code>, note that it is still “17”):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print value assigned to xy_sum</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>xy_sum</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 17</code></pre>
+</div>
+</div>
+<p>In order for the value assigned to <code>xy_sum</code> to be updated with the new value of <code>x</code>, we must run the assignment operation again, with the updated value of x:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assigns sum of "y" and newly updated value of "x" to "xy_sum" object</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>xy_sum<span class="ot">&lt;-</span>x<span class="sc">+</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, the value of <code>xy_sum</code> should reflect the updated value of <code>x</code>, which we can confirm by printing the value of <code>xy_sum</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value of "xy_sum"</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>xy_sum</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20</code></pre>
+</div>
+</div>
+<p>Note that the value assigned to <code>xy_sum</code> is now “20” (the sum of “8” and “12”), rather than “17” (the sum of “5” and “12”).</p>
+<p>Thus far, we’ve been working with numeric values, but it’s also possible to assign non-numeric contents to objects. For example, we can assign strings (i.e.&nbsp;lines of text) to objects. Below, consider the string “Boulder, CO” assigned to an object named <code>our_location:</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assigns string "Boulder, CO" to object named "our_location"</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>our_location<span class="ot">&lt;-</span><span class="st">"Boulder, CO"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can print the string that has been assigned to the <code>our_location</code> object by typing the name of the object in our console, or running it from our script:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints contents assigned to "our_location" object</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>our_location</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Boulder, CO"</code></pre>
+</div>
+</div>
+<section id="naming-objects" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="naming-objects"><span class="header-section-number">4.1</span> Naming Objects</h2>
+<p>While the examples above were very simple, we can assign virtually any R code, and by extension, the data structure(s) generated by that code (such as datasets, vectors, graphs/plots, functions etc.) to an R object. When naming your objects, try to be descriptive, so that the name of the object signifies something about the code or outputs assigned to it.</p>
+<p>Note that generally speaking, you have a lot of flexibility in naming your R objects, but there are certain rules. For example, object names must start with a letter, and cannot contain any special symbols (they can only contain letters, numbers, underscores, and periods). Also, object names cannot contain multiple unconnected words; if you’d like to use multiple words or phrases, connect the discrete elements with an underscore (<code>_</code>), or use camel case (where different words are distinguished by beginning each discrete word begins with a capitalized letter). In addition, there are certain words that are “reserved” for other purposes, and therefore cannot be used in object names (i.e.&nbsp;<code>if</code>, <code>else</code>, <code>TRUE</code> , <code>FALSE</code>, etc).</p>
+<p>It is also worth emphasizing that object names are case sensitive; in order to print the contents assigned to an object, that object’s name must be printed <em>exactly</em> as it was created. For example, if we were to type <code>our_Location</code>, we would get an error, since there is no <code>our_Location</code> object (only an <code>our_location</code> object):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints contents of "our_Location"</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>our_Location</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error: object 'our_Location' not found</code></pre>
+</div>
+</div>
+<p>In order to keep track of the objects we have created, we can use the handy <code>ls()</code> function, which will print the names of all the objects that are in memory:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints objects in memory</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "our_location" "x"            "xy_sum"       "y"           </code></pre>
+</div>
+</div>
+<p>To delete an object from memory, you can pass it to the <code>rm()</code> function. For example, the following will delete the <code>our_location</code> object from memory:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># deletes "our_location" object from memory</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(our_location)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we can confirm that the <code>our_location</code> object has indeed been deleted by running <code>ls()</code> once again:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints objects in memory</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "x"      "xy_sum" "y"     </code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="data-structures" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Data Structures</h1>
+<p>We now turn to a brief overview of some important data structures that help us to work with data in R. We will consider three data structures that are particularly useful: vectors, data frames, and lists. Note that this is not an exhaustive treatment of data structures in R; there are other structures, such as matrices and arrays, that are also important, and which you may encounter or use in your future work. However, for now, we will limit our discussion to vectors, data frames, and lists, since they are the data structures that are essential for getting started with data-based social scientific research in R, and the data structures that you will likely use most frequently.</p>
 <section id="vectors" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="vectors"><span class="header-section-number">5.1</span> Vectors</h2>
+<p>In R, a vector is a sequence of values. A vector is created using the <code>c()</code> function. We’ll discuss functions at greater later, but for now you can think of a function as a programmed command that takes inputs, and returns an output.</p>
+<p>For example, let’s make a vector to store the temperatures (in Celsius) of some cities in Asia. The <code>c()</code> function takes as its input a series of numbers, and returns as its output a numeric vector with those numbers as elements:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># makes vector with values 32, 18, 41, 11</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">32</span>, <span class="dv">18</span>, <span class="dv">41</span>, <span class="dv">11</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 32 18 41 11</code></pre>
+</div>
+</div>
+<p>Recall that we can assign vectors to objects with descriptive names. Let’s create a new vector object named <code>asia_temperatures_celsius</code> to store these values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assigns vector of temperatures from Asian cities to a new object named "asia_temperatures_celsius"</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>asia_temperatures_celsius<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="dv">32</span>, <span class="dv">18</span>, <span class="dv">41</span>, <span class="dv">11</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, whenever we want to print the vector assigned to the <code>asia_temperatures_celsius</code> object, we can simply print the name of the object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints contents of "asia_temperatures_celsius"</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>asia_temperatures_celsius</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 32 18 41 11</code></pre>
+</div>
+</div>
+<p>Though we have focused so far on numeric vectors (i.e.&nbsp;vectors where the elements are numbers), it is also possible to create vectors where the elements are strings (i.e.&nbsp;text). For example, let’s create a vector that contains the names of cities that have a University of Colorado campus, and assign it to an object named <code>university_of_colorado_locations</code></p>
 </section>
 <section id="data-frames" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="data-frames"><span class="header-section-number">5.2</span> Data Frames</h2>
