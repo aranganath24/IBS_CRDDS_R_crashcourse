@@ -1,5 +1,5 @@
 ---
-title: "Exploring, Processing, and Analyzing Data in R"
+title: "Processing, Wrangling and Analyzing Data in R"
 author: "Aditya Ranganath"
 format: 
   html:
@@ -11,23 +11,170 @@ format:
 editor: visual
 ---
 
-## Quarto
+# Introduction
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+# Installing Packages and Loading Libraries
 
-## Running Code
+```{r chunk1}
+#| eval: FALSE
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+# Install packages using the "install.packages" function
+install.packages("tidyverse")
+install.packages("psych")
+install.packages("janitor")
+install.packages("fastDummies")
 ```
 
-You can add options to executable code like this
+```{r chunk2}
+#| eval: FALSE
+
+# Installing multiple packages by passing package names as strings to the "install.packages" function
+install.packages(c("tidyverse", "psych", "janitor", "fastDummies"))
+```
+
+```{r test3}
+#| warning: FALSE
+#| message: FALSE
+# load libraries
+library(tidyverse)
+library(psych)
+library(janitor)
+library(fastDummies)
+library(janitor)
+```
+
+```{r}
+library(DT)
+```
+
+# Data Transfer: Reading Data into R
+
+## Reading in Local Files
+
+```{r test4}
+#| include: false
+setwd("/Users/adra7980/Library/CloudStorage/OneDrive-UCB-O365/Desktop/git-repositories/IBS_CRDDS_R_crashcourse/session3")
+```
+
+```{r}
+# reads in the workshop dataset (Persson and Tabellini cross-national dataset) by passing the file path as an argument to the "read_csv" and assigns it to a new object named "pt"
+pt<-read_csv("data/pt/persson_tabellini_workshop.csv")
+```
+
+```{r}
+#| eval: FALSE
+
+# Views the dataset in the R Studio data viewer
+View(pt)
+```
 
 ```{r}
 #| echo: false
-2 * 2
+pt %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Reading in Data from Cloud Storage
+
+# Processing, Wrangling, and Analyzing Numeric Data
+
+```{r}
+# makes a copy of "pt", called "pt_copy" that we can use for processing and analysis; keeps the original data frame, "pt" untouched
+pt_copy<-pt
+```
+
+## Missing Data
+
+## Summary Statistics
+
+Once we have a dataset loaded into R, one of the first things we'll likely want to do after taking a look at the dataset in the viewer with the `View()` function is to generate a table of summary statistics. A quick way to do that is to use the `describe()` function from the *psych* package. Below, we’ll generate summary statistics for the `pt_copy` dataset by passing it to the `describe()` function, and assign the resulting table of summary statistics to a new object named `pt_copy_summarystats1`.
+
+```{r}
+# Generate summary statistics for "pt_copy" and assign table of summary statistics to a new object named "pt_copy_summarystats1"
+pt_copy_summarystats1<-describe(pt_copy)
+```
+
+Let's go ahead and view the table of summary statistics. We can print the object to our console:
+
+```{r}
+# prints contents of "pt_copy_summarystats1" to console
+pt_copy_summarystats1
+```
+
+Or, alternatively (and preferably), we can view the table in the data viewer:
+
+```{r}
+#| eval: false
+# prints contents of "pt_copy_summarystats1" to console
+View(pt_copy_summarystats1)
+```
+
+```{r}
+#| echo: false
+pt_copy_summarystats1 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+## Data Cleaning and Preparation
+
+### Rearranging Columns
+
+### Renaming Variables
+
+### Sorting Datasets With Respect to Variables
+
+### Creating New Variables Based on Existing Variables
+
+### Selecting or Deleting Variables
+
+### Recoding Variables 
+
+### Subsetting Variables
+
+# Elementary Data Analysis
+
+## Computing Correlations
+
+## Basic Regression Models
+
+## Regression Diagnostics
+
+## Creating and Exporting Regression Tables
+
+# Working With Multiple Datasets
+
+## Reading in Multiple Datasets
+
+## Joining Data
+
+## Appending Data
+
+## Reshaping Data
+
+## Automating Data Processing with Functions
+
+# Exporting Data
+
+## Exporting a Data Frame
+
+## Exporting Multiple Data Frames
+
+### 
+
+```{r}
+#| echo: FALSE
+x<-4
+x
+```
