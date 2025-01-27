@@ -814,6 +814,7 @@ example_list
 As you can see, our list contains each of the various specified objects within a single, unified structure. We can access specific elements within a list using the specific index number of the desired element, in much the same way we did for vectors. When extracting a single list element from a list, the convention is to enclose the index number of the desired list element in double square brackets. For example, if we want to extract the country-level data frame from `example_list`, we can use the following:
 
 ```{r}
+# extracts third element from "example_list"
 example_list[[3]]
 ```
 
@@ -903,7 +904,7 @@ As expected, `example_list` belongs to the class "list".
 Let's consider another:
 
 ```{r}
-# prints class of "example_list"
+# prints class of "asia_temperatures_fahrenheit"
 class(asia_temperatures_fahrenheit)
 ```
 
