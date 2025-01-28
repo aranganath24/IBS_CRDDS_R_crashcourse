@@ -401,21 +401,293 @@ table(pt_copy$continent, pt_copy$federal)
 
 ## Group-Level Summary Statistics
 
-## Data Cleaning and Preparation
+While having a simple table of summary statistics is a useful starting point, it is often useful to generate group-level summary statistics, where summary statistics are presented for different subgroups in the dataset. One way to generate group summary statistics is to use the `describeBy()` function (also from the *psych* package), where the first argument is the data frame you would like to generate group-level summary statistics for, and the second argument is the column that contains the relevant groups. Below, we generate summary statistics for `pt_copy` parsed out by the different continents in the "continent" column. The expression `pt_copy$continent` indicates that the groups with respect to which we want to calcualte the summary statistics is in the "continent" column of the `pt_copy` data frame. More generally, we can explicitly refer to columns in an R data frame using this dollar-sign notation, where the expression before the dollar sign refers to the data frame object, and the expression after refers to the name of the column.
+
+The `describeBy()` function will produce a list that contains summary statistics for different groups as list elements. Below, we'll assign the list of group summary statistics to a new object named `summary_stats_by_continent`:
+
+```{r}
+# Creates summary statistics for each continent grouping, and puts results in list named "summary_stats_by_continent"
+summary_stats_by_continent<-describeBy(pt_copy, pt_copy$continent)
+```
+
+Now, let's say we want to extract the summary statistics for Africa, one of the continent categories in the "continent" column. We can do so using the double-bracket notation we discussed above:
+
+```{r}
+# Accessing continent-level summary statistics for africa from the "summary_stats_by_continent" list
+summary_stats_by_continent[["africa"]]
+```
+
+Recall that we can assign list elements that we extract from a list to their own object, which allows us to conveniently retrieve it whenever it is needed. Below, we'll assign the summary statistics for Africa to a new object named `africa_summary`:
+
+```{r}
+# Group-level summary statistics can be assigned to their own object for easy retrieval
+africa_summary<-summary_stats_by_continent[["africa"]]
+```
+
+Another convenient way to extract group-level statistics is with the *dplyr* package's `group_by()` function. First, we'll run the code below, and assign it to a new object named `trade_age_by_continent`:
+
+```{r}
+# Generate a table that displays summary statistics for trade at the continent level and assign to object named "trade_age_by_continent"
+trade_age_by_continent<-pt_copy %>% 
+                          group_by(continent) %>% 
+                            summarise(meanTrade=mean(trade),sdTrade=sd(trade),
+                                      meanAge=mean(age), sdAge=sd(age),
+                                      n=n())
+```
+
+Let's now print the contents of `trade_age_by_continent`:
+
+```{r}
+# prints contents of "trade_age_by_continent"
+trade_age_by_continent
+```
+
+Let's now unpack the code that created this table. We started with the `pt_copy` data frame, and then used `group_by(continent)` to declare that subsequent calculations should be performed at the continent-level; then, within the `summarise()` function, we defined the column names we wanted to use in the group-level summary table, and how those variables are to be calculated. For example, `meanTrade=mean(trade)` indicates that we want the first column to be named "meanTrade", which is to be calculated by taking the mean of the "trade" variable for each continent grouping. After that, `sdTrade=sd(trade)` indicates that we want the second column to be named "sdTrade", which is to be calculated by taking the standard deviation of the "trade" variable for each continent grouping. And so on. Note that `n=n()` indicates that we want the final column, named "n", to provide information about the number of observations in each continent-level grouping.
+
+You might have noticed a mysterious symbol in the above code that comes immediately after `pt_copy`, and immediately after `group_by(continent)`. This symbol is known as a “pipe” (`%>%`). The pipe operator effectively takes the contents to its left, and then uses these contents as an input to the code on its right. Above, the pipe takes the contents of `pt_copy` on its left, and then feeds this data into the `group_by()` function on the right; then, after grouping the data by continent, it feeds this grouped data on its left into the `summarise()` function on its right. We will use the pipe operator throughout the lesson to chain together functions in this manner.
+
+## Data Cleaning and Wrangling
+
+After getting a sense of your data by computing some summary statistics and running some crosstabs, you'll often have a sense of how you would like to clean or transform your data for analysis. This section briefly describes some functions that are useful for these basic data-preparation and wrangling tasks. Most of these functions are from the *tidyverse*'s *dplyr* package.
 
 ### Rearranging Columns
 
+We can manipulate the order of the columns in a dataset using the `relocate` function. For example, the code below uses the `relocate()` function to shift the "country" column to the front of the dataset, and then assigns this change back to `pt_copy` to update the object:
+
+```{r}
+# bring the "country" column to the front of the dataset
+pt_copy<-pt_copy %>% relocate(country)
+```
+
+Go ahead and confirm that the change has been implemented by viewing `pt_copy` in the data viewer:
+
+```{r}
+#| eval: false
+# Views "pt_copy" in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+We can specify more than one argument to the `relocate` function. For example, in the code below, passing the "country", "list", "trade", and "oecd" variables/columns to the `relocate()` function will make "country" the first column, "list" the second column, "trade" the third column, and so on.
+
+```{r}
+# bring the "country", "list", "trade", "oecd" columns to the front of the dataset
+pt_copy<-pt_copy %>% relocate(country, list, trade, oecd)
+```
+
+Let's go ahead and view the updated dataset in the R Studio Viewer:
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
 ### Renaming Variables
+
+In order to rename variables, we can use the `rename()` function, as below. The code below renames the existing "list" variable to "party_list", which is more descriptive, and assigns the change back to the `pt_copy` object.
+
+```{r}
+## Renaming a variable (renames "list" to "party_list")
+pt_copy<-pt_copy %>% rename(party_list=list)
+```
+
+Let's check the `pt_copy` data frame in the viewer to ensure that the change has been made.
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+You can rename more than one variable at a time using the `rename()` function; simply separate the arguments by a comma. For example, if we wanted to also change the variable currently named "ctrycd" to "country_code", in addition to changing "list" to "party_list", we could use the following expression: `pt_copy<-pt_copy %>% rename(party_list=list, country_code=ctrycd)`
 
 ### Sorting Datasets With Respect to Variables
 
+It is often useful to sort a data frame in ascending or descending order with respect to a given variable. The code below sorts the `pt_copy` data frame in ascending order with respect to the "trade" variable using the `arrange()` function:
+
+```{r}
+# sorting in ascending (low to high) order with respect to the "trade" variable
+pt_copy<-pt_copy %>% arrange(trade)
+```
+
+If, instead, you want to sort the dataset in descending order with respect to the "trade" variable, pass the name of the variable to the `desc()` function within the `arrange()` function, as below:
+
+```{r}
+# sorting in descending (high to low) order with respect to the "trade" variable
+pt_copy<-pt_copy %>% arrange(desc(trade))
+```
+
+Note that it's also possible to pass several arguments to the arrange function, and thereby sort a dataset with respect to multiple variables; for example, the code below first relocates the "continent" column and the "trade" column towards the front of the dataset (just after "Country), then sorts the dataset by continent, and then further sorts it in descending order by trade. This allows us to quickly note the country in each continent grouping with the highest value on the "trade" variable.
+
+```{r}
+# takes the "pt_copy" dataset, relocates "country", "continent", and "trade" to the front of the dataset, and then arranges the dataset based on the "continent" variable, then in descending order with respect to the "trade" variable
+pt_copy<-pt_copy %>% 
+        relocate(country, continent, trade) %>% 
+        arrange(continent, desc(trade))
+```
+
+Let's go ahead and see what this looks like using the Viewer:
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Sorting a dataset with respect to more than one variable can be especially useful in certain contexts, particularly in cases where you're dealing with nested data. For example, in a time series dataset, it can be useful to first sort by year, then by months within the year. In a dataset with regional information, it could be helpful to first sort by regional, then by cities within those regional groupings.
+
 ### Creating New Variables Based on Existing Variables
+
+Depending on your research question and empirical strategy, it is often useful or necessary to create new variables in your dataset, based on existing variables. To do so, we can use *dplyr's* `mutate()` function. The code below, for example, uses the `mutate()` function to create a new variable, named "non_catholic_80", that is computed by subtracting the existing "catho80" variable from 100; for convenience, the "country", "catho80", and newly created "non_catholic_80" variables are all moved to the front of the dataset using the `relocate()` function:
+
+```{r}
+# Create new variable named "non_catholic_80" that is calculated by substracting the Catholic share of the population in 1980 ("catho80") from 100  and relocates "country", "catho80", and the newly created "non_catholic_80" to the front of the dataset
+pt_copy<-pt_copy %>% mutate(non_catholic_80=100-catho80) %>% 
+                     relocate(country, catho80, non_catholic_80)
+```
+
+We can view the updated `pt_copy` data frame to confirm that the new variable has been created:
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Note that it's possible to define more than one new variable at a time using `mutate()`; simply separate the arguments by a comma within the `mutate()` function.
 
 ### Selecting or Deleting Variables
 
+Sometimes, we will have a dataset with many variables, and to make things more tractable, we'll want to select only the variables that are relevant to our analysis. we can explicitly select desired variables using the `select()` function from *dplyr*. The code below selects the "country", "cgexp", "cgrev", "trade", and "federal" columns from `pt_copy`, and then assigns this selection to a new object named `pt_copy_selection`:
+
+```{r}
+# Selects "country", "cgexp", "cgrev", and "trade" variables from the "pt_copy" dataset and assigns the selection to a new object named "pt_copy_selection"
+pt_copy_selection<-pt_copy %>% 
+                    select(country, cgexp, cgrev, trade, federal)
+```
+
+When we view the `pt_copy_selection` object in the data viewer, we'll see that we now have a new data frame that consists only of these variables:
+
+```{r}
+#| eval: false
+# views "pt_copy_selection" in data viewer
+View(pt_copy_selection)
+```
+
+```{r}
+#| echo: false
+# prints updated contents of "pt_copy"
+pt_copy_selection %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Sometimes, it could make more sense to directly delete columns, instead of deciding on which ones to keep or select. For example, the code below deletes the "federal" variable from `pt_copy_selection` by passing it to the `select()` column with a "-" in front of it.
+
+```{r}
+# deletes "federal" variable from "pt_copy_selection"
+pt_copy_selection %>% select(-federal)
+```
+
+If you want to delete multiple columns, simply specify the columns in a vector, preceded by a minus sign, that is passed to the `select()` function. The code below, for instance, takes the existing `pt_copy_selection` data frame, deletes the "federal" and "trade" columns, and assigns the result to a new object named `pt_copy_selection_modified`:
+
+```{r}
+# deletes "federal" and "trade" from "pt_copy_selection" and assigns it to new object named "pt_copy_selection_modified"
+pt_copy_selection_modified<-pt_copy_selection %>% select(-c(federal, trade))
+```
+
+Check the `pt_copy_selection_modified` data frame in the data viewer to confirm these changes:
+
+```{r}
+#| eval: false
+# views "pt_copy_selection_modified" in data viewer
+View(pt_copy_selection_modified)
+```
+
+```{r}
+#| echo: false
+pt_copy_selection_modified %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
 ### Recoding Variables
 
-### Subsetting Variables
+"Recoding" a variable refers to the process of taking an existing variable, and generating new variable(s) that represent the information from that original variable in a new way. Below, we'll consider some common recoding operations.
+
+### Creating Dummy Variables from Continuous Numeric Variables
+
+### Subsetting (Filtering) Variables
 
 # Elementary Data Analysis
 
