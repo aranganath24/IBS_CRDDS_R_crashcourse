@@ -687,6 +687,31 @@ pt_copy_selection_modified %>% datatable(extensions=c("Scroller", "FixedColumns"
 
 ### Creating Dummy Variables from Continuous Numeric Variables
 
+You may sometimes have a continuous numeric variable, but want to create a new dummy variable (a variable that takes on the value of 1 if a given condition is met, and 0 otherwise) based on that numeric variable. For example, let's say we want to create a new variable, named "trade_open" that takes on the value of 1 if the trade variable is greater than or equal to 77, and 0 otherwise. We can generate this new dummy variable using the `mutate()` function; within the `mutate()` function below, we specify that we want to create a new variable named "trade_open"; the `ifelse()` function specifies the desired condition (trade\>=77), followed by the value the new "trade_open" variable is to take if the condition is met (1), and the value the new "trade_open" variable is to take if the condition is not met (0). In other words, we can translate `ifelse(trade>=77, 1, 0)` to "if trade\>=77, set the 'trade_open' variable to 1, otherwise set it to 0." We'll assign the data frame with the new "trade_open" variable back to "pt_copy":
+
+```{r}
+# Creates a new dummy variable based on the existing "trade" variable named "trade_open" (which takes on a value of "1" if "trade" is greater than or equal to 77, and 0 otherwise) and then moves the newly created variable to the front of the dataset along with "country" and "trade"; all changes are assigned to "pt_copy", thereby overwriting the existing version of "pt_copy"
+
+pt_copy<-pt_copy %>% mutate(trade_open=ifelse(trade>=77, 1, 0)) %>% 
+                     relocate(country, trade_open, trade)
+```
+
+View the data frame to ensure that the new variable "trade_open", recoded based on "trade", has been created:
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Creating categorical variables from continuous numeric variables
+
 ### Subsetting (Filtering) Variables
 
 # Elementary Data Analysis
@@ -805,6 +830,11 @@ world_bank_list_cleaned<-map(world_bank_list, worldbank_cleaning_function)
 # Exporting Data
 
 ## Exporting a Data Frame
+
+```{r}
+# exports "worldbank_trade_fdi_wide" to a local directory
+write_csv(worldbank_trade_fdi, "outputs/worldbank_trade_fdi.csv")
+```
 
 ## Exporting Multiple Data Frames
 

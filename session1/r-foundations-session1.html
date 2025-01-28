@@ -838,8 +838,8 @@ length</code></pre>
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-89d602b744635358b1d5" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-89d602b744635358b1d5">{"x":{"filter":"none","vertical":false,"extensions":["Scroller","FixedColumns"],"data":[["1","2","3"],["Country A","Country B","Country C"],[8000,30000,23500],[2000,5400,10000],["South America","Europe","North America"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Country<\/th>\n      <th>GDP<\/th>\n      <th>Population<\/th>\n      <th>Continent<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"deferRender":true,"scrollY":350,"scrollX":350,"dom":"t","scroller":true,"fixedColumns":{"leftColumns":3},"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Country","targets":1},{"name":"GDP","targets":2},{"name":"Population","targets":3},{"name":"Continent","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-edaf46c7ccc5e46952de" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-edaf46c7ccc5e46952de">{"x":{"filter":"none","vertical":false,"extensions":["Scroller","FixedColumns"],"data":[["1","2","3"],["Country A","Country B","Country C"],[8000,30000,23500],[2000,5400,10000],["South America","Europe","North America"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Country<\/th>\n      <th>GDP<\/th>\n      <th>Population<\/th>\n      <th>Continent<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"deferRender":true,"scrollY":350,"scrollX":350,"dom":"t","scroller":true,"fixedColumns":{"leftColumns":3},"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Country","targets":1},{"name":"GDP","targets":2},{"name":"Population","targets":3},{"name":"Continent","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Note the “tidy” features of this simple data frame:</p>
@@ -1231,10 +1231,49 @@ Manila                            83.3</code></pre>
 <div class="sourceCode cell-code" id="cb186"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb186-1"><a href="#cb186-1" aria-hidden="true" tabindex="-1"></a>fahrenheit_colorado<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="dv">33</span>, <span class="dv">15</span>, <span class="dv">22</span>, <span class="dv">44</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The first temperature is associated with Boulder; the second with Fort Collins; the third with Denver; and the fourth with Colorado Springs. Assign cities as labels to the temperature values with which they’re associated, and update <code>fahrenheit_colorado</code> with these changes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb187"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb187-1"><a href="#cb187-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assigns names to "fahrenheit_colorado" using the "names" function and a vector of names</span></span>
+<span id="cb187-2"><a href="#cb187-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(fahrenheit_colorado)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"Boulder"</span>, <span class="st">"Fort Collins"</span>, <span class="st">"Denver"</span>, <span class="st">"Colorado Springs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb188"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints labeled "fahrenheit_colorado" vector</span></span>
+<span id="cb188-2"><a href="#cb188-2" aria-hidden="true" tabindex="-1"></a>fahrenheit_colorado</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Boulder     Fort Collins           Denver Colorado Springs 
+              33               15               22               44 </code></pre>
+</div>
+</div>
 <p><em>Question 2</em></p>
 <p>Apply a transformation to <code>fahrenheit_colorado</code> that converts the temperature values to Celsius, and assign this new vector of Celsius temperatures to a new object named <code>celsius_colorado</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb190"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb190-1"><a href="#cb190-1" aria-hidden="true" tabindex="-1"></a><span class="co"># applies Fahrenheit to Celsius conversion formula to "fahrenheit_colorado" and assigns resulting vector of Celsius values to a new object named "celsius_colorado"</span></span>
+<span id="cb190-2"><a href="#cb190-2" aria-hidden="true" tabindex="-1"></a>celsius_colorado<span class="ot">&lt;-</span>(fahrenheit_colorado<span class="dv">-32</span>)<span class="sc">*</span><span class="dv">5</span><span class="sc">/</span><span class="dv">9</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb191"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints contents of "celsius_colorado"</span></span>
+<span id="cb191-2"><a href="#cb191-2" aria-hidden="true" tabindex="-1"></a>celsius_colorado</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Boulder     Fort Collins           Denver Colorado Springs 
+       0.5555556       -9.4444444       -5.5555556        6.6666667 </code></pre>
+</div>
+</div>
 <p><em>Question 3</em></p>
 <p>Transform the class of the updated <code>celsius_colorado</code> object into “data.frame”, and assign the new data frame to an object named <code>celsius_colorado_df.</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="co"># uses "as.data.frame" function to transform "celsius_colorado" into a data.frame object, and assigns the data frame to a new object named "celsius_colorado_df"</span></span>
+<span id="cb193-2"><a href="#cb193-2" aria-hidden="true" tabindex="-1"></a>celsius_colorado_df<span class="ot">&lt;-</span><span class="fu">as.data.frame</span>(celsius_colorado)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb194"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb194-1"><a href="#cb194-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints contents of "celsius_colorado_df"</span></span>
+<span id="cb194-2"><a href="#cb194-2" aria-hidden="true" tabindex="-1"></a>celsius_colorado_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 celsius_colorado
+Boulder                 0.5555556
+Fort Collins           -9.4444444
+Denver                 -5.5555556
+Colorado Springs        6.6666667</code></pre>
+</div>
+</div>
 <p><em>Question 4</em></p>
 <p>Consider our toy country-level data frame, which is reproduced below:</p>
 <div class="cell">
@@ -1246,11 +1285,71 @@ Manila                            83.3</code></pre>
 </div>
 </div>
 <p>A). What is the class of the “Continent” Column?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb197"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb197-1"><a href="#cb197-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts class of "Continent" column</span></span>
+<span id="cb197-2"><a href="#cb197-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(country_df<span class="sc">$</span>Continent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+</div>
 <p>B). Extract the “Population” column into a new object. What is it’s class? Convert it to the “data.frame” class.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb199"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb199-1"><a href="#cb199-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts "Population" column into a new object named "country_df_population"</span></span>
+<span id="cb199-2"><a href="#cb199-2" aria-hidden="true" tabindex="-1"></a>country_df_population<span class="ot">&lt;-</span>country_df<span class="sc">$</span>Population</span>
+<span id="cb199-3"><a href="#cb199-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-4"><a href="#cb199-4" aria-hidden="true" tabindex="-1"></a><span class="co"># prints class of "country_df_population"</span></span>
+<span id="cb199-5"><a href="#cb199-5" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(country_df_population)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "numeric"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb201"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb201-1"><a href="#cb201-1" aria-hidden="true" tabindex="-1"></a><span class="co"># converts "country_df_population" to a data.frame</span></span>
+<span id="cb201-2"><a href="#cb201-2" aria-hidden="true" tabindex="-1"></a>country_df_population<span class="ot">&lt;-</span><span class="fu">as.data.frame</span>(country_df_population)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>C. Extract the first three columns of <code>country_df</code> and assign this subsetted data frame to a new object. View it in the R Studio data viewer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb202"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb202-1"><a href="#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts first three columns of "country_df_columns" and assigns it to a new object named "country_df_columns"</span></span>
+<span id="cb202-2"><a href="#cb202-2" aria-hidden="true" tabindex="-1"></a>country_df_columns<span class="ot">&lt;-</span>country_df[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb202-3"><a href="#cb202-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-4"><a href="#cb202-4" aria-hidden="true" tabindex="-1"></a><span class="co"># prints "country_df_columns", pass object to View() function to see it in the data viewer</span></span>
+<span id="cb202-5"><a href="#cb202-5" aria-hidden="true" tabindex="-1"></a>country_df_columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Country   GDP Population
+1 Country A  8000       2000
+2 Country B 30000       5400
+3 Country C 23500      10000</code></pre>
+</div>
+</div>
 <p>D. Extract the value of Country B’s population using indexing.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb204"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb204-1"><a href="#cb204-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts Country B's population (2nd row, 3rd column)</span></span>
+<span id="cb204-2"><a href="#cb204-2" aria-hidden="true" tabindex="-1"></a>country_df[<span class="dv">2</span>,<span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5400</code></pre>
+</div>
+</div>
 <p><em>Question 5</em></p>
 <p>Deposit <code>fahrenheit_colorado,</code> <code>celsius_colorado</code> , and <code>country_df</code> into a new list object. After you have done so, extract <code>country_df</code> from the list using index numbers and bracket notation. Then, assign the list elements names of your choosing, and extract the <code>celsius_colorado</code> list object using its name and bracket notation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb206"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb206-1"><a href="#cb206-1" aria-hidden="true" tabindex="-1"></a><span class="co"># makes a list with the relevant elements and assigns it to a new object named "exercise_list"</span></span>
+<span id="cb206-2"><a href="#cb206-2" aria-hidden="true" tabindex="-1"></a>exercise_list<span class="ot">&lt;-</span><span class="fu">list</span>(fahrenheit_colorado, celsius_colorado, country_df)</span>
+<span id="cb206-3"><a href="#cb206-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb206-4"><a href="#cb206-4" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts "country_df" from list using its index</span></span>
+<span id="cb206-5"><a href="#cb206-5" aria-hidden="true" tabindex="-1"></a>country_df[[<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  2000  5400 10000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb208"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb208-1"><a href="#cb208-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assigns names to "exercise_list"</span></span>
+<span id="cb208-2"><a href="#cb208-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(exercise_list)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"CO_F"</span>, <span class="st">"CO_C"</span>, <span class="st">"ToyDF"</span>)</span>
+<span id="cb208-3"><a href="#cb208-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb208-4"><a href="#cb208-4" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts data frame using its list label</span></span>
+<span id="cb208-5"><a href="#cb208-5" aria-hidden="true" tabindex="-1"></a>exercise_list[[<span class="st">"ToyDF"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Country   GDP Population     Continent
+1 Country A  8000       2000 South America
+2 Country B 30000       5400        Europe
+3 Country C 23500      10000 North America</code></pre>
+</div>
+</div>
 </section>
 
 </main>
