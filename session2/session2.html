@@ -8,7 +8,7 @@
 
 <meta name="author" content="Aditya Ranganath">
 
-<title>R Foundations: Basics of Functional Programming</title>
+<title>R Foundations: Functional Programming Essentials</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -109,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">R Foundations: Basics of Functional Programming</h1>
+<h1 class="title">R Foundations: Functional Programming Essentials</h1>
 </div>
 
 
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Now, let’s use the built in <code>mean()</code> function to calculate the mean of the vector elements in <code>sample_vector</code>. We pass <code>sample_vector</code> as an argument to the <code>mean()</code> function, which performs the calculation based on its internal programming, and returns the mean of the vector elements as the output:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculates the mean of vector elements</span></span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculates the mean of vector elements using built-in "mean" function</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(sample_vector)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 7.4</code></pre>
@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Thus far, we’ve been exploring elementary functions that perform mathematical calculations on numeric vectors. Let’s consider a function that’s relevant for character vectors. The <code>nchar()</code> function takes a string as an argument, and returns the number of characters in that string as the output. Below, we’ll pass the argument “Hello, World!” to <code>nchar(),</code> which returns the number of characters in that argument:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculates the number of characters in a string</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculates the number of characters in a string using built-in "nchar" function</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nchar</span>(<span class="st">"Hello, World!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 13</code></pre>
@@ -198,8 +198,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Now, let’s consider the <code>colnames()</code> function, which is a built-in function that takes a data frame as an input, and returns the names of all of its columns. The argument to the <code>colnames()</code> function is <code>mtcars</code>, which is a dataset that’s built into R (R comes installed with several in-built datasets that are very helpful for practicing new skills and experimenting with code). If you’d like, you can get a sense of the <code>mtcars</code> dataset by passing it to the view function, or by viewing its documentation with <code>?mtcars</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts column names for "mtcars" dataset, which is built into R</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts column names for "mtcars" dataset (which is built into R) using the built-in</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># "ncol" function</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"
 [11] "carb"</code></pre>
@@ -275,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>In the function’s final line,&nbsp;<code>return(celsius_output)</code>, we specify the value we want the function to return. Here, we are saying that we want the function to return the value that was assigned to&nbsp;<code>celsius_output</code>. We then close the function by typing a left-facing curly brace below the return statement&nbsp;<code>}</code>.</p></li>
 <li><p>Just as we can assign data or visualizations to objects that allow us to subsequently retrieve the outputs of our code, so too with functions. Here, we’ll assign the function we have just return to an object named&nbsp;<code>fahrenheit_to_celsius_converter</code>.</p></li>
 </ul>
-<p>After running that code, we can use the newly created&nbsp;<code>fahrenheit_to_celsius</code>&nbsp;function to perform our Fahrenheit to Celsius transformations. Let’s say we have a Fahrenheit value of 68, and want to transform it to Celsius:</p>
+<p>After running that code, we can use the newly created&nbsp;<code>fahrenheit_to_celsius()</code> function to perform our Fahrenheit to Celsius transformations. Let’s say we have a Fahrenheit value of 68, and want to transform it to Celsius:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests function using an input of 68 degrees fahrenheit</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fahrenheit_to_celsius_converter</span>(<span class="at">fahrenheit_input=</span><span class="dv">68</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -373,20 +374,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The <code>if</code> block is always evaluated first. If if the <code>if</code> condition is <code>FALSE</code>, the program moves to the <code>else if</code> block (there can be multiple such blocks). If none of the <code>if</code> or <code>else if</code> conditions are met, the <code>else</code> block (which is optional) executes.</p>
 <p>Let’s take an example; below, we’ll create a function that takes two arguments, “value”, and “unit”. The “value” argument is a numeric temperature value, while “unit” is a string that specifies whether “value” is in Celsius or Fahrenheit. If the input temperature value is in Fahrenheit, the function coverts it to Celsius and returns this value; if the input value is not in Fahrenheit (i.e.&nbsp;is in Celsius), the function converts the input to Fahrenheit, and returns this value; and finally, if the specified input temperature is in neither Celsius nor Fahrenheit, the function returns a message saying “Please indicate whether your input is in Celsius or Fahrenheit”:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>convert_temperature <span class="ot">&lt;-</span> <span class="cf">function</span>(value, unit) {</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (unit <span class="sc">==</span> <span class="st">"Fahrenheit"</span>) {</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert Fahrenheit to Celsius</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    celsius <span class="ot">&lt;-</span> (value <span class="sc">-</span> <span class="dv">32</span>) <span class="sc">*</span> <span class="dv">5</span> <span class="sc">/</span> <span class="dv">9</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(celsius)</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (unit <span class="sc">==</span> <span class="st">"Celsius"</span>) {</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert Celsius to Fahrenheit</span></span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    fahrenheit <span class="ot">&lt;-</span> (value <span class="sc">*</span> <span class="dv">9</span> <span class="sc">/</span> <span class="dv">5</span>) <span class="sc">+</span> <span class="dv">32</span></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(fahrenheit)</span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle invalid input for the unit</span></span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="st">"Please indicate whether your input is in Celsius or Fahrenheit"</span>)</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># creates a function that takes a temperature value ("value"), and a temperature scale label ("unit") that is either "Fahrenheit" or "Celsius" which designates the temperature scale of the input temperature value; if the input argument is in "Fahrenheit", the function converts the temperature to Celsius and returns this value; if the input is in "Celsius" the function converts the temperature to Fahrenheit and returns this value; if the the temperature scale label is neither "Fahrenheit" nor "Celsius" an error message is returned to the user; the function is assigned to a new object named "convert_temperature"</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>convert_temperature <span class="ot">&lt;-</span> <span class="cf">function</span>(value, unit) {</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (unit <span class="sc">==</span> <span class="st">"Fahrenheit"</span>) {</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert Fahrenheit to Celsius</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    celsius <span class="ot">&lt;-</span> (value <span class="sc">-</span> <span class="dv">32</span>) <span class="sc">*</span> <span class="dv">5</span> <span class="sc">/</span> <span class="dv">9</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(celsius)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (unit <span class="sc">==</span> <span class="st">"Celsius"</span>) {</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert Celsius to Fahrenheit</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    fahrenheit <span class="ot">&lt;-</span> (value <span class="sc">*</span> <span class="dv">9</span> <span class="sc">/</span> <span class="dv">5</span>) <span class="sc">+</span> <span class="dv">32</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(fahrenheit)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle invalid input for the unit</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="st">"Please indicate whether your input is in Celsius or Fahrenheit"</span>)</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s go ahead and test the function. Let’s say we want to convert 100 degrees Fahrenheit to Celsius:</p>
 <div class="cell">
@@ -427,7 +429,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Now, we’ll use the <code>map()</code> function to iteratively apply <code>fahrenheit_to_celsius_converter()</code> to each element in that vector, and deposit the results in a list. We’ll pass<code>fahrenheit_input_vector</code>&nbsp;as the first argument to the&nbsp;<code>map()</code>&nbsp;function, and&nbsp;<code>fahrenheit_to_celsius_converter()</code>&nbsp;(i.e.&nbsp;the function we want to apply iteratively to the elements in `the<code>fahrenheit_input_vector</code>&nbsp;) as the second argument. The result of this operation will be a new “results list”, containing the transformed temperature values for each input in the original vector of Fahrenheit values (<code>fahrenheit_input_vector</code>). We’ll assign this result/output list to a new object named<code>celsius_outputs_list</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># iteratively applies the "fahrenheit_to_celsius_converter" function to the vector of inputs, "fahrenheit_input_vector", and assigns the resulting list of outputs to "celsius_outputs_vector"</span></span>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># iteratively applies the "fahrenheit_to_celsius_converter" function to the vector of input arguments, "fahrenheit_input_vector", and assigns the resulting list of outputs to "celsius_outputs_vector"</span></span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>celsius_outputs_list<span class="ot">&lt;-</span><span class="fu">map</span>(<span class="at">.x=</span>fahrenheit_input_vector, <span class="at">.f=</span>fahrenheit_to_celsius_converter)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In short, the code above takes <code>fahrenheit_input_vector</code> and runs each of these numbers through the <code>fahrenheit_to_celsius_converter()</code> function, and sequentially deposits the transformed result to the newly created <code>celsius_outputs_list</code> object, which contains the transformed Celsius values:</p>
@@ -480,8 +482,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>As expected, we see that it is a vector containing the output Fahrenheit values generated by the function.</p>
 <p>What if we want a data frame that contains the input Fahrenheit values as one column, and the output Celsius columns as another? We can do so by using the <code>map_dbl()</code> function in conjunction with the arguments above within the <code>data.frame()</code> function that can define a data frame. In particular:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>fahrenheit_celsius_df_output<span class="ot">&lt;-</span><span class="fu">data.frame</span>(<span class="at">Fahrenheit=</span>fahrenheit_input_vector,</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">Celsius=</span><span class="fu">map_dbl</span>(<span class="at">.x=</span>fahrenheit_input_vector, <span class="at">.f=</span>fahrenheit_to_celsius_converter))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># creates a data frame in which one column contains Fahrenheit input values, and the other contains Celsius output values</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>fahrenheit_celsius_df_output<span class="ot">&lt;-</span><span class="fu">data.frame</span>(<span class="at">Fahrenheit=</span>fahrenheit_input_vector,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">Celsius=</span><span class="fu">map_dbl</span>(<span class="at">.x=</span>fahrenheit_input_vector, <span class="at">.f=</span>fahrenheit_to_celsius_converter))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s confirm that the data frame has been created as expected:</p>
 <div class="cell">
@@ -784,7 +787,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>It’s worth noting that when we request an output that is not supported, we receive the expected error message. For example, let’s specify our desired output as a tibble (i.e.&nbsp;a special type of data frame):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="co"># uses "fahrenheit_to_celsius_general" function to convert the temperature values in "test_vector_ftoc" to Celsius and return the outputs as a vector</span></span>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="co"># uses "fahrenheit_to_celsius_general" function to convert the temperature values in "test_vector_ftoc" to Celsius and return the outputs as a tibble</span></span>
 <span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fahrenheit_to_celsius_general</span>(<span class="at">vector_of_fahrenheit_inputs=</span>test_vector_ftoc, <span class="at">desired_output=</span><span class="st">"Tibble"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>Error in fahrenheit_to_celsius_general(vector_of_fahrenheit_inputs = test_vector_ftoc, : Error: Please indicate whether your desired output is a 'Vector', 'Data.Frame', or 'List'</code></pre>
@@ -799,34 +802,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>x<span class="ot">&lt;-</span><span class="dv">24</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>toy_function<span class="ot">&lt;-</span><span class="cf">function</span>(input1){</span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  x<span class="ot">&lt;-</span><span class="dv">5</span></span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  z<span class="ot">&lt;-</span>x<span class="sc">+</span>input1</span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(z)</span>
-<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co"># creates a toy function that takes a numeric input argument ("input1"); it defines an object, x, within the function, then defines a function, z, that's the sum of x and input1. It returns Z as an output</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>toy_function<span class="ot">&lt;-</span><span class="cf">function</span>(input1){</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  x<span class="ot">&lt;-</span><span class="dv">5</span></span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  z<span class="ot">&lt;-</span>x<span class="sc">+</span>input1</span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(z)</span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">toy_function</span>(<span class="at">input1=</span><span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co"># passes the argument "input1=7" to the toy function</span></span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">toy_function</span>(<span class="at">input1=</span><span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 12</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value of x</span></span>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value of x; note it returns the value from the global environment</span></span>
 <span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 24</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value of z</span></span>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints value of z; note that there's an error, since z is only defined within the local environment of the function</span></span>
 <span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>Error: object 'z' not found</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints objects</span></span>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prints objects in memory; note that z is not included, since it's only defined within the function</span></span>
 <span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "celsius_outputs_list"            "celsius_outputs_vector"         
