@@ -1,5 +1,5 @@
 ---
-title: "R Foundations: Basics of Functional Programming"
+title: "R Foundations: Functional Programming Essentials"
 author: "Aditya Ranganath"
 format: 
   html:
@@ -52,7 +52,7 @@ prod(sample_vector)
 Now, let's use the built in `mean()` function to calculate the mean of the vector elements in `sample_vector`. We pass `sample_vector` as an argument to the `mean()` function, which performs the calculation based on its internal programming, and returns the mean of the vector elements as the output:
 
 ```{r}
-# calculates the mean of vector elements
+# calculates the mean of vector elements using built-in "mean" function
 mean(sample_vector)
 ```
 
@@ -66,14 +66,15 @@ median(sample_vector)
 Thus far, we've been exploring elementary functions that perform mathematical calculations on numeric vectors. Let's consider a function that's relevant for character vectors. The `nchar()` function takes a string as an argument, and returns the number of characters in that string as the output. Below, we'll pass the argument "Hello, World!" to `nchar(),` which returns the number of characters in that argument:
 
 ```{r}
-# calculates the number of characters in a string
+# calculates the number of characters in a string using built-in "nchar" function
 nchar("Hello, World!")
 ```
 
 Now, let's consider the `colnames()` function, which is a built-in function that takes a data frame as an input, and returns the names of all of its columns. The argument to the `colnames()` function is `mtcars`, which is a dataset that's built into R (R comes installed with several in-built datasets that are very helpful for practicing new skills and experimenting with code). If you'd like, you can get a sense of the `mtcars` dataset by passing it to the view function, or by viewing its documentation with `?mtcars`.
 
 ```{r}
-# extracts column names for "mtcars" dataset, which is built into R
+# extracts column names for "mtcars" dataset (which is built into R) using the built-in
+# "ncol" function
 colnames(mtcars)
 ```
 
@@ -148,7 +149,7 @@ Let’s unpack the code above, which we used to create our function:
 
 -   Just as we can assign data or visualizations to objects that allow us to subsequently retrieve the outputs of our code, so too with functions. Here, we’ll assign the function we have just return to an object named `fahrenheit_to_celsius_converter`.
 
-After running that code, we can use the newly created `fahrenheit_to_celsius` function to perform our Fahrenheit to Celsius transformations. Let’s say we have a Fahrenheit value of 68, and want to transform it to Celsius:
+After running that code, we can use the newly created `fahrenheit_to_celsius()` function to perform our Fahrenheit to Celsius transformations. Let’s say we have a Fahrenheit value of 68, and want to transform it to Celsius:
 
 ```{r}
 # tests function using an input of 68 degrees fahrenheit
@@ -249,6 +250,7 @@ The `if` block is always evaluated first. If if the `if` condition is `FALSE`, t
 Let's take an example; below, we'll create a function that takes two arguments, "value", and "unit". The "value" argument is a numeric temperature value, while "unit" is a string that specifies whether "value" is in Celsius or Fahrenheit. If the input temperature value is in Fahrenheit, the function coverts it to Celsius and returns this value; if the input value is not in Fahrenheit (i.e. is in Celsius), the function converts the input to Fahrenheit, and returns this value; and finally, if the specified input temperature is in neither Celsius nor Fahrenheit, the function returns a message saying "Please indicate whether your input is in Celsius or Fahrenheit":
 
 ```{r}
+# creates a function that takes a temperature value ("value"), and a temperature scale label ("unit") that is either "Fahrenheit" or "Celsius" which designates the temperature scale of the input temperature value; if the input argument is in "Fahrenheit", the function converts the temperature to Celsius and returns this value; if the input is in "Celsius" the function converts the temperature to Fahrenheit and returns this value; if the the temperature scale label is neither "Fahrenheit" nor "Celsius" an error message is returned to the user; the function is assigned to a new object named "convert_temperature"
 convert_temperature <- function(value, unit) {
   if (unit == "Fahrenheit") {
     # Convert Fahrenheit to Celsius
@@ -305,7 +307,7 @@ fahrenheit_input_vector<-c(45.6, 95.9, 67.8, 43)
 Now, we'll use the `map()` function to iteratively apply `fahrenheit_to_celsius_converter()` to each element in that vector, and deposit the results in a list. We’ll pass`fahrenheit_input_vector` as the first argument to the `map()` function, and `fahrenheit_to_celsius_converter()` (i.e. the function we want to apply iteratively to the elements in \`the`fahrenheit_input_vector` ) as the second argument. The result of this operation will be a new “results list”, containing the transformed temperature values for each input in the original vector of Fahrenheit values (`fahrenheit_input_vector`). We’ll assign this result/output list to a new object named`celsius_outputs_list`:
 
 ```{r}
-# iteratively applies the "fahrenheit_to_celsius_converter" function to the vector of inputs, "fahrenheit_input_vector", and assigns the resulting list of outputs to "celsius_outputs_vector"
+# iteratively applies the "fahrenheit_to_celsius_converter" function to the vector of input arguments, "fahrenheit_input_vector", and assigns the resulting list of outputs to "celsius_outputs_vector"
 celsius_outputs_list<-map(.x=fahrenheit_input_vector, .f=fahrenheit_to_celsius_converter)
 ```
 
@@ -355,6 +357,7 @@ As expected, we see that it is a vector containing the output Fahrenheit values 
 What if we want a data frame that contains the input Fahrenheit values as one column, and the output Celsius columns as another? We can do so by using the `map_dbl()` function in conjunction with the arguments above within the `data.frame()` function that can define a data frame. In particular:
 
 ```{r}
+# creates a data frame in which one column contains Fahrenheit input values, and the other contains Celsius output values
 fahrenheit_celsius_df_output<-data.frame(Fahrenheit=fahrenheit_input_vector,
                                          Celsius=map_dbl(.x=fahrenheit_input_vector, .f=fahrenheit_to_celsius_converter))
 ```
@@ -626,7 +629,7 @@ It's worth noting that when we request an output that is not supported, we recei
 
 ```{r}
 #| error: true
-# uses "fahrenheit_to_celsius_general" function to convert the temperature values in "test_vector_ftoc" to Celsius and return the outputs as a vector
+# uses "fahrenheit_to_celsius_general" function to convert the temperature values in "test_vector_ftoc" to Celsius and return the outputs as a tibble
 fahrenheit_to_celsius_general(vector_of_fahrenheit_inputs=test_vector_ftoc, desired_output="Tibble")
 ```
 
@@ -638,6 +641,7 @@ x<-24
 ```
 
 ```{r}
+# creates a toy function that takes a numeric input argument ("input1"); it defines an object, x, within the function, then defines a function, z, that's the sum of x and input1. It returns Z as an output
 toy_function<-function(input1){
   x<-5
   z<-x+input1
@@ -646,22 +650,23 @@ toy_function<-function(input1){
 ```
 
 ```{r}
+# passes the argument "input1=7" to the toy function
 toy_function(input1=7)
 ```
 
 ```{r}
-# prints value of x
+# prints value of x; note it returns the value from the global environment
 x
 ```
 
 ```{r}
 #| error=TRUE
-# prints value of z
+# prints value of z; note that there's an error, since z is only defined within the local environment of the function
 z
 ```
 
 ```{r}
-# prints objects
+# prints objects in memory; note that z is not included, since it's only defined within the function
 ls()
 ```
 
