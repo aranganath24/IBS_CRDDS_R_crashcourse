@@ -1,4 +1,10 @@
 ---
+title: "session3b"
+format: html
+editor: visual
+---
+
+---
 title: "Processing, Wrangling and Analyzing Data in R"
 author: "Aditya Ranganath"
 format: 
@@ -13,7 +19,7 @@ editor: visual
 
 # Introduction
 
-In the past two sessions, we presented some ideas, concepts, and tools that provide a basic foundation for working with data in R. Now that we have this basic foundation, we'll turn in this session to a more applied exploration of some actual datasets. Our goal here is to introduce you to some useful functions that will allow you to explore and begin making sense of actual datasets in R. This lesson will provide a tour of various functions that can be particularly helpful as you get started cleaning, and wrangling data in R. Among the topics we'll cover today are:
+In the past two sessions, we presented some ideas, concepts, and tools that provide a basic foundation for working with data in R. Now that we have this basic foundation, we'll turn in this session to a more applied exploration of some actual datasets. Our goal here is to introduce you to some useful functions that will allow you to explore and begin making sense of actual datasets in R. This lesson will provide a tour of various functions that can be particularly helpful as you get started cleaning, wrangling, and analyzing your data in R. Among the topics we'll cover today are:
 
 -   Loading data into R
 
@@ -23,7 +29,15 @@ In the past two sessions, we presented some ideas, concepts, and tools that prov
 
 -   Data cleaning and processing
 
-We will be working with a handful of datasets, which you will need to [download](https://www.dropbox.com/scl/fo/2aianyhhdx92auh9aa6l2/AP1MzlzGD3KL2YBI-o9I4v4?rlkey=tm7z8sr0sxpjm5uquu154ni99&st=2a34xm00&dl=0). We will primarily be working with a crossnational dataset collected and made public by the economists Torsten Persson and Guido Tabellini; it's one of the datasets they work with in their highly influential book, entitled "The Economic Effects of Constitutions." The codebook for the dataset is provided along with the data in the downloaded materials. We'll also be working with some datasets collected from the World Bank's [World Development Indicators](https://databank.worldbank.org/source/world-development-indicators) next class, and these datasets are included in the data download.
+-   Basic analysis (correlations and regressions)
+
+-   Joining Data
+
+-   Reshaping Data
+
+-   Exporting data out of R
+
+We will be working with a handful of datasets, which you will need to [download](https://www.dropbox.com/scl/fo/2aianyhhdx92auh9aa6l2/AP1MzlzGD3KL2YBI-o9I4v4?rlkey=tm7z8sr0sxpjm5uquu154ni99&st=2a34xm00&dl=0). We will primarily be working with a crossnational dataset collected and made public by the economists Torsten Persson and Guido Tabellini; it's one of the datasets they work with in their highly influential book, entitled "The Economic Effects of Constitutions." The codebook for the dataset is provided along with the data in the downloaded materials. We'll also be working with some datasets collected from the World Bank's [World Development Indicators](https://databank.worldbank.org/source/world-development-indicators).
 
 # Installing Packages and Loading Libraries
 
@@ -1115,6 +1129,408 @@ pt_copy_sans_africa %>% datatable(extensions=c("Scroller", "FixedColumns"), opti
   scroller = TRUE,
   fixedColumns = list(leftColumns = 3)
 ))
+```
+
+# Elementary Data Analysis
+
+In this section, we'll review some functions that can implement some basic data analysis tasks. Our focus is not on the methodologies themselves, but how to implement them.
+
+## Computing Correlations
+
+### Computing a correlation coefficient
+
+We can compute a basic correlation coefficient using the `core.test()` function:
+
+```{r}
+# computes correlation coefficient between "trade" and "cgexp" variables and assigns the result to a new object named "trade_cgexp_cc"
+trade_cgexp_cc<-cor.test(pt_copy$trade, pt_copy$cgexp)
+```
+
+```{r}
+# prints results of "trade_cgexp_cc"
+trade_cgexp_cc
+```
+
+We can format this more cleanly using the `tidy()` function from the *broom* package (part of the *tidyverse*:
+
+```{r}
+# cleans up formatting of "trade_cgexp_cc"
+broom::tidy(trade_cgexp_cc)
+```
+
+We can assign this neater version of the model output to a new object named `trade_cgexp_cc_clean`:
+
+```{r}
+# assigns well-formatted model output to "trade_cgexp_cc_clean"
+trade_cgexp_cc_clean<-broom::tidy(trade_cgexp_cc)
+```
+
+### Generating a correlation matrix
+
+To generate a correlation matrix, we can use the `cor()` function. First, we'll select the variables we want to examine:
+
+```{r}
+# generating a correlation matrix
+# Extracts variables for which we want a correlation matrix
+desired_variables<-pt_copy %>% select(trade, cgexp, cgrev, catho80)
+```
+
+Now, we can pass `desired_variables` as an argument to the `cor()` function, and assign it to a new object named `cor_matrix`:
+
+```{r}
+# Creates correlation matrix from "desired_variables" object and assigns to object named "cor_matrix"
+cor_matrix<-cor(desired_variables, use="complete.obs")
+```
+
+```{r}
+# prints contents of "cor_matrix"
+cor_matrix
+```
+
+## Basic Regression Models
+
+### Bivariate Regression
+
+We can run a linear regression model in R using the `lm()` function, where the first argument is the dependent variable, and the independent variables appear after the `~` that follows the dependent variable. We must also specify what data is being modeled using the `data` argument. Below, we'll calculate a simple bivariate regression using `pt_copy`, where the independent variable is "cgexp" (central goverment expenditure), and the independent variable is "trade" (as a share of GDP). We'll assign the output of the model to a new object named `regression1:`
+
+```{r}
+# implements bivariate regression with "gexp" as DV and "trade" as IV; assigned to "regression1" object
+regression1<-lm(cgexp~trade, data=pt_copy)
+```
+
+We can view the regression output by passing the object to the `summary` function:
+
+```{r}
+# prints output of "regression1"
+summary(regression1)
+```
+
+### Multivariate Regression
+
+The process for multivariate regression is much the same as for bivariate regression; we simply add the additional independent variables after with a "+" sign. Below, we compute a regression with additional covariates and assign it to the object named `regression2`:
+
+```{r}
+# Implements regression with "gexp" as DV, and assigns to object named "regression1"
+regression2<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd, data=pt_copy)
+```
+
+Now, we can print out model output using the `summary` function:
+
+```{r}
+# prints output of "regression2"
+summary(regression2)
+```
+
+### Categorical Variables in a Regression Model
+
+#### Factor Variables
+
+```{r}
+# prints class of "continent" variable
+class(pt_copy$continent)
+```
+
+```{r}
+# Set "continent" variable as factor
+pt_copy$continent<-as.factor(pt_copy$continent)
+```
+
+```{r}
+# check levels of "continent" factor variable
+levels(pt_copy$continent)
+```
+
+```{r}
+# Relevels factor variable to set "other" as reference category
+pt_copy$continent<-relevel(pt_copy$continent, ref="other")
+```
+
+```{r}
+# Run regression with the continent variable and assign result to object named "regression2"
+regression3<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+continent+col_espa+col_uka+col_otha+oecd, data=pt_copy)
+
+```
+
+```{r}
+# Prints regression table for "regression3"
+summary(regression3)
+```
+
+#### Dummy Variables
+
+Alternatively, we can use dummy variables.
+
+```{r}
+# Use "continent" field to make continent dummy variables
+pt_copy<-pt_copy %>% dummy_cols("continent")
+```
+
+```{r}
+# includes dummy variables in regression with "other" as the excluded category
+regression3_alt<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+continent_africa+
+                      continent_asiae+continent_laam+col_espa+col_uka+col_otha+oecd,
+                      data=pt_copy)
+```
+
+```{r}
+# prints results of "regression3_alt"; note that that it's equivalent to the results of "regression3" because using factor variables and dummies are different ways of doing the same thing
+summary(regression3_alt)
+```
+
+### Interaction Terms
+
+```{r}
+# run regression with interaction term between "trade" and "federal"
+trade_federal_interaction<-lm(cgexp~trade*federal, data=pt_copy)
+```
+
+```{r}
+# prints "trade_federal_interaction" regression table
+summary(trade_federal_interaction)
+```
+
+```{r}
+# Finds mean value of trade variable
+mean(pt_copy$trade)
+```
+
+```{r}
+# Calculates marginal effects of federalism, with "trade" held at mean
+marginal_effect_federalism<-ggpredict(trade_federal_interaction, terms="federal", condition=c(trade=78.7659))
+```
+
+```{r}
+# Prints marginal effects table
+marginal_effect_federalism
+```
+
+# Working With Multiple Datasets
+
+## Data Transfer Part 2: Reading in Multiple Datasets
+
+```{r}
+# prints the names of the files we want to read in and assigns the vector of strings to a new object named "worldbank_filenames" 
+worldbank_filenames<-list.files("data/wb")
+```
+
+```{r}
+# reads world bank files into a list that is assigned to an object named "world_bank_list"
+setwd("data/wb")
+world_bank_list<-map(worldbank_filenames, read_csv)
+```
+
+```{r}
+# prints contents of "world_bank_list"
+world_bank_list
+```
+
+```{r}
+# removes CSV extension from "worldbank_filenames"
+worldbank_filenames_base<-str_remove(worldbank_filenames, ".csv")
+```
+
+```{r}
+# assigns names to datasets in "world_bank_list"
+names(world_bank_list)<-worldbank_filenames_base
+```
+
+```{r}
+#| eval: false
+# extracts fdi dataset from "world_bank_list" by assigned name
+world_bank_list[["wdi_fdi2019"]]
+```
+
+```{r}
+#| echo: false
+head(world_bank_list[["wdi_fdi2019"]])
+```
+
+## Joining Data
+
+```{r}
+# extracts fdi dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_fdi"
+wdi_fdi<-world_bank_list[["wdi_fdi2019"]]
+```
+
+```{r}
+# extracts debt dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_debt"
+wdi_debt<-world_bank_list[["wdi_debt2019"]]
+```
+
+```{r}
+# drop na's in debt and FDI datasets and rename variables
+wdi_debt<-wdi_debt %>%
+            drop_na() %>% 
+            rename(debt_2019=`2019 [YR2019]`)
+
+wdi_fdi<-wdi_fdi %>% 
+            drop_na() %>% 
+            rename(fdi_2019=`2019 [YR2019]`)
+```
+
+```{r}
+# join together "wdi_fdi" and "wdi_fdi" using country code
+debt_fdi_join<-full_join(wdi_fdi, wdi_debt, by="Country Code")
+```
+
+## Appending Data
+
+```{r}
+# extracts worldbank FDI data from "world_bank_list" and assigns it to the object "worldbank_fdi_2019"
+worldbank_fdi_2019<-world_bank_list[["wdi_fdi2019"]]
+
+# extracts worldbank trade data from "world_bank_list" and assigns it to the object "worldbank_trade_2019"
+worldbank_trade_2019<-world_bank_list[["wdi_trade2019"]]
+```
+
+```{r}
+# Appends "worldbank_trade_2019" to "worldbank_fdi_2019" and assigns new dataset to object named "worldbank_trade_fdi"
+worldbank_trade_fdi<-bind_rows(worldbank_fdi_2019, worldbank_trade_2019)
+```
+
+## Reshaping Data
+
+### Long to Wide
+
+```{r}
+# cleans the dataset before reshaping
+worldbank_trade_fdi_cleaned<-worldbank_trade_fdi %>% 
+                              rename(economic_variables="2019 [YR2019]",
+                                     series_code="Series Code") %>% 
+                              select(-"Series Name") %>% 
+                              drop_na()
+                      
+                                      
+```
+
+```{r}
+# converts "economic_variables" to numeric
+worldbank_trade_fdi_cleaned$economic_variables<-as.numeric(worldbank_trade_fdi_cleaned$economic_variables)
+```
+
+```{r}
+# reshapes "worldbank_trade_fdi_cleaned" from long to wide and assigns the wide dataset to an object named "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_cleaned %>% 
+                              tidyr:: pivot_wider(names_from=series_code,
+                                          values_from=economic_variables)
+```
+
+```{r}
+# renames columns in "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_wide %>% 
+                          rename(trade=NE.TRD.GNFS.ZS,
+                                 FDI=BX.KLT.DINV.WD.GD.ZS)
+```
+
+```{r}
+#| eval: false
+# Views "worldbank_trade_fdi_wide" in the Viewer
+View(worldbank_trade_fdi_wide)
+```
+
+```{r}
+#| echo: false
+worldbank_trade_fdi_wide %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Wide to Long
+
+```{r}
+# reshapes "worldbank_trade_fdi_wide" back to long format and assigns the reshaped dataset to a new object named "world_bank_trade_long"
+world_bank_trade_long<-worldbank_trade_fdi_wide %>% 
+                        pivot_longer(cols=c(FDI, trade),
+                                     names_to="economic_variable",
+                                     values_to = "2019")
+                        
+```
+
+## Automating Data Processing with Functions
+
+```{r}
+# write function to clean World Bank dataset
+worldbank_cleaning_function<-function(input_dataset){
+  modified_dataset<-input_dataset %>% 
+                      select(-"Series Code") %>% 
+                      rename("Country"="Country Name",
+                             "CountryCode"="Country Code",
+                             "Series"="Series Name",
+                             "2019"="2019 [YR2019]") %>% 
+                      drop_na(CountryCode)
+  return(modified_dataset)
+}
+```
+
+```{r}
+# Iteratively apply "worldbank_cleaning_function" to all of the datasets in "world_bank_list", and deposit the cleaned datasets into a new list named "world_bank_list_cleaned"
+world_bank_list_cleaned<-map(world_bank_list, worldbank_cleaning_function)
+```
+
+# Data Transfer Part 2: Exporting Data
+
+## Exporting a Data Frame
+
+```{r}
+# exports "worldbank_trade_fdi_wide" to a local directory
+write_csv(worldbank_trade_fdi, "outputs/worldbank_trade_fdi.csv")
+```
+
+## Exporting a Summary Statistics Table
+
+```{r}
+# writes summary statistics table "pt_copy_summarystats1_df"  as CSV
+write.csv(pt_copy_summarystats1, "outputs/summary_statistics.csv", row.names = TRUE)
+```
+
+```{r}
+# exports a text summary stats table with stargazer
+stargazer(as.data.frame(pt_copy), type="text", title="Descriptive Statistics", digits=1, out="outputs/summary_stats.txt")
+
+```
+
+```{r}
+# exports an html summary stats table with stargazer
+stargazer(as.data.frame(pt_copy), type = "text", title = "Descriptive Statistics", digits = 1, out = "outputs/summary_stats.html")
+
+```
+
+## Exporting Regression Tables
+
+```{r}
+#| results: hide
+# makes list container for regressions we want to export
+regression_list<-list(regression1, regression2, regression3)
+```
+
+```{r}
+#| results: hide
+# exports regressions in "regression_list" via stargazer as html
+stargazer(regression_list, type="html", out="outputs/cgexp_regressions.html")
+```
+
+```{r}
+#| results: hide
+
+# exports regressions in "regression_list" via stargazer as text file
+stargazer(regression_list, type="text", out="outputs/cgexp_regressions.txt")
+```
+
+## Iteratively Exporting Multiple Data Frames
+
+```{r}
+# create file names for exported World Bank files
+WB_filenames_export<-paste0("outputs/", worldbank_filenames_base, "_cleaned.csv")
+```
+
+```{r}
+# exports datasets in "world_bank_list_cleaned" to "outputs" directory using filenames in "WB_filenames_export"
+walk2(world_bank_list_cleaned, WB_filenames_export, write_csv)
 ```
 
 # Exercises
