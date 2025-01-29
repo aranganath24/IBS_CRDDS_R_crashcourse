@@ -1,5 +1,5 @@
 ---
-title: "Processing, Wrangling and Analyzing Data in R"
+title: "Processing and Wrangling Data in R"
 author: "Aditya Ranganath"
 format: 
   html:
