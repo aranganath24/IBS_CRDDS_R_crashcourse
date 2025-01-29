@@ -24,6 +24,8 @@ install.packages("psych")
 install.packages("janitor")
 install.packages("fastDummies")
 install.packages("stargazer")
+install.packages("gtsummary")
+install.packages("ggeffects")
 ```
 
 ```{r chunk2}
@@ -44,6 +46,8 @@ library(fastDummies)
 library(janitor)
 library(summarytools)
 library(stargazer)
+library(gtsummary)
+library(ggeffects)
 ```
 
 ```{r}
@@ -388,7 +392,13 @@ pt_summary_ST %>% datatable(extensions=c("Scroller", "FixedColumns"), options = 
 ))
 ```
 
-The *summarytools* package also provides some useful functions for generating frequency tables and crosstabs, to which we now turn.
+The *summarytools* package also provides some useful functions for generating frequency tables and crosstabs.
+
+Another handy package is *stargazer*, which is most useful for creating and exporting regression tables, but which can also produce a well-formatted summary statistics table that is ready to be exported. We can use *stargazer* to create a summary statistics table with the following (we'll export it in a later section):
+
+```{r}
+stargazer(as.data.frame(pt_copy), type = "text")
+```
 
 ## Frequency Tables and Crosstabs
 
@@ -943,6 +953,18 @@ trade_cgexp_cc<-cor.test(pt_copy$trade, pt_copy$cgexp, use="complete.obs")
 trade_cgexp_cc
 ```
 
+We can format this more cleanly using the `tidy()` function from the *broom* package (part of the *tidyverse*:
+
+```{r}
+# cleans up formatting of "trade_cgexp_cc"
+broom::tidy(trade_cgexp_cc)
+```
+
+```{r}
+# assigns well-formatted model output to "trade_cgexp_cc_clean"
+trade_cgexp_cc_clean<-broom::tidy(trade_cgexp_cc)
+```
+
 ### Generating a correlation matrix
 
 ```{r}
@@ -961,15 +983,114 @@ cor_matrix<-cor(desired_variables, use="complete.obs")
 cor_matrix
 ```
 
-```{r}
-stargazer(cor_matrix, type="text", title="Correlation Matrix", digits=3, out="outputs/corr_table.html")
-```
-
 ## Basic Regression Models
 
-## Regression Diagnostics
+### Bivariate Regression
 
-## Creating and Exporting Regression Tables
+```{r}
+# implements bivariate regression with "gexp" as DV and "trade" as IV; assigned to "regression1" object
+regression1<-lm(cgexp~trade, data=pt_copy)
+```
+
+```{r}
+# prints output of "regression1"
+summary(regression1)
+```
+
+### Multivariate Regression
+
+```{r}
+# Implements regression with "gexp" as DV, and assigns to object named "regression1"
+regression2<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd, data=pt_copy)
+```
+
+```{r}
+# prints output of "regression2"
+summary(regression2)
+```
+
+### Categorical Variables in a Regression Model
+
+#### Factor Variables
+
+```{r}
+# prints class of "continent" variable
+class(pt_copy$continent)
+```
+
+```{r}
+# Set "continent" variable as factor
+pt_copy$continent<-as.factor(pt_copy$continent)
+```
+
+```{r}
+# check levels of "continent" factor variable
+levels(pt_copy$continent)
+```
+
+```{r}
+# Relevels factor variable to set "other" as reference category
+pt_copy$continent<-relevel(pt_copy$continent, ref="other")
+```
+
+```{r}
+# Run regression with the continent variable and assign result to object named "regression2"
+regression3<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+continent+col_espa+col_uka+col_otha+oecd, data=pt_copy)
+
+```
+
+```{r}
+# Prints regression table for "regression3"
+summary(regression3)
+```
+
+#### Dummy Variables
+
+Alternatively, we can use dummy variables.
+
+```{r}
+# Use "continent" field to make continent dummy variables
+pt_copy<-pt_copy %>% dummy_cols("continent")
+```
+
+```{r}
+# includes dummy variables in regression with "other" as the excluded category
+regression3_alt<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+continent_africa+
+                      continent_asiae+continent_laam+col_espa+col_uka+col_otha+oecd,
+                      data=pt_copy)
+```
+
+```{r}
+# prints results of "regression3_alt"; note that that it's equivalent to the results of "regression3" because using factor variables and dummies are different ways of doing the same thing
+summary(regression3_alt)
+```
+
+### Interaction Terms 
+
+```{r}
+# run regression with interaction term between "trade" and "federal"
+trade_federal_interaction<-lm(cgexp~trade*federal, data=pt_copy)
+```
+
+```{r}
+# prints "trade_federal_interaction" regression table
+summary(trade_federal_interaction)
+```
+
+```{r}
+# Finds mean value of trade variable
+mean(pt_copy$trade)
+```
+
+```{r}
+# Calculates marginal effects of federalism, with "trade" held at mean
+marginal_effect_federalism<-ggpredict(trade_federal_interaction, terms="federal", condition=c(trade=78.7659))
+```
+
+```{r}
+# Prints marginal effects table
+marginal_effect_federalism
+```
 
 # Working With Multiple Datasets
 
@@ -1008,6 +1129,32 @@ world_bank_list[["wdi_fdi2019"]]
 
 ## Joining Data
 
+```{r}
+# extracts fdi dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_fdi"
+wdi_fdi<-world_bank_list[["wdi_fdi2019"]]
+```
+
+```{r}
+# extracts debt dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_debt"
+wdi_debt<-world_bank_list[["wdi_debt2019"]]
+```
+
+```{r}
+# drop na's in debt and FDI datasets and rename variables
+wdi_debt<-wdi_debt %>%
+            drop_na() %>% 
+            rename(debt_2019=`2019 [YR2019]`)
+
+wdi_fdi<-wdi_fdi %>% 
+            drop_na() %>% 
+            rename(fdi_2019=`2019 [YR2019]`)
+```
+
+```{r}
+# join together 
+debt_fdi_join<-full_join(wdi_fdi, wdi_debt, by="Country Code")
+```
+
 ## Appending Data
 
 ```{r}
@@ -1023,34 +1170,67 @@ worldbank_trade_2019<-world_bank_list[["wdi_trade2019"]]
 worldbank_trade_fdi<-bind_rows(worldbank_fdi_2019, worldbank_trade_2019)
 ```
 
-```{r}
-worldbank_trade_fdi<-worldbank_trade_fdi %>% drop_na()
-                                        
-```
-
-```{r}
-worldbank_trade_fdi_clean<-worldbank_trade_fdi %>%  
-  rename("Country"="Country Name",
-          "CountryCode"="Country Code",
-          "Series"="Series Name",
-           "variable"="2019 [YR2019]",
-            "SeriesCode"="Series Code") %>% 
-     mutate(ID = row_number())
-  
-```
-
 ## Reshaping Data
 
+### Long to Wide
+
 ```{r}
-# reshapes "worldbank_trade_fdi" from long to wide
-worldbank_trade_fdi_wide<-worldbank_trade_fdi_clean %>% 
-                            pivot_wider(names_from=SeriesCode,
-                                        values_from=variable)
-                            
+# cleans the dataset
+worldbank_trade_fdi_cleaned<-worldbank_trade_fdi %>% 
+                              rename(economic_variables="2019 [YR2019]",
+                                     series_code="Series Code") %>% 
+                              select(-"Series Name") %>% 
+                              drop_na()
+                      
+                                      
 ```
 
 ```{r}
-worldbank_trade_fdi_wide
+# converts "economic_variables" to numeric
+worldbank_trade_fdi_cleaned$economic_variables<-as.numeric(worldbank_trade_fdi_cleaned$economic_variables)
+```
+
+```{r}
+# reshapes "worldbank_trade_fdi_cleaned" from long to wide and assigns the wide dataset to an object named "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_cleaned %>% 
+                              tidyr:: pivot_wider(names_from=series_code,
+                                          values_from=economic_variables)
+```
+
+```{r}
+# renames columns
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_wide %>% 
+                          rename(trade=NE.TRD.GNFS.ZS,
+                                 FDI=BX.KLT.DINV.WD.GD.ZS)
+```
+
+```{r}
+#| eval: false
+# Views "worldbank_trade_fdi_wide" in the Viewer
+View(worldbank_trade_fdi_wide)
+```
+
+```{r}
+#| echo: false
+worldbank_trade_fdi_wide %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Wide to Long
+
+```{r}
+# reshapes "worldbank_trade_fdi_wide" back to long format and assigns the reshaped dataset to a new object named "world_bank_trade_long"
+world_bank_trade_long<-worldbank_trade_fdi_wide %>% 
+                        pivot_longer(cols=c(FDI, trade),
+                                     names_to="economic_variable",
+                                     values_to = "2019")
+                        
 ```
 
 ## Automating Data Processing with Functions
@@ -1083,7 +1263,44 @@ world_bank_list_cleaned<-map(world_bank_list, worldbank_cleaning_function)
 write_csv(worldbank_trade_fdi, "outputs/worldbank_trade_fdi.csv")
 ```
 
-## Exporting Multiple Data Frames
+## Exporting a Summary Statistics Table
+
+```{r}
+# writes summary statistics table "pt_copy_summarystats1_df"  as CSV
+write.csv(pt_copy_summarystats1, "outputs/summary_statistics.csv", row.names = TRUE)
+```
+
+```{r}
+# exports a text table with stargazer
+stargazer(as.data.frame(pt_copy), type="text", title="Descriptive Statistics", digits=1, out="outputs/summary_stats.txt")
+
+```
+
+```{r}
+# exports an html table with stargazer
+stargazer(as.data.frame(pt_copy), type = "text", title = "Descriptive Statistics", digits = 1, out = "outputs/summary_stats.html")
+
+```
+
+## Exporting Regression Tables
+
+```{r}
+#| results: hide
+# makes list container for regressions we want to export
+regression_list<-list(regression1, regression2, regression3)
+```
+
+```{r}
+#| results: hide
+stargazer(regression_list, type="html", out="outputs/cgexp_regressions.html")
+```
+
+```{r}
+#| results: hide
+stargazer(regression_list, type="html", out="outputs/cgexp_regressions.txt")
+```
+
+## Iteratively Exporting Multiple Data Frames 
 
 ```{r}
 # create file names for exported World Bank files
