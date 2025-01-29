@@ -23,6 +23,7 @@ install.packages("tidyverse")
 install.packages("psych")
 install.packages("janitor")
 install.packages("fastDummies")
+install.packages("stargazer")
 ```
 
 ```{r chunk2}
@@ -42,6 +43,7 @@ library(janitor)
 library(fastDummies)
 library(janitor)
 library(summarytools)
+library(stargazer)
 ```
 
 ```{r}
@@ -712,11 +714,256 @@ pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
 
 ### Creating categorical variables from continuous numeric variables
 
+Sometimes, we will want to create a variable that contains categories or classifications that derive from numeric thresholds of an existing variable. For instance, let's say we want to take the existing "trade" variable, and define a new variable named "trade_level", which is set to "Low Trade" when the "trade" variable is greater than 15 and less than 50; "Intermediate_Trade" when the "trade" variable is greater than or equal to 50 and less than 100; and "High_Trade" when the "trade" variable is greater than or equal to 100. The code below creates this new "trade_level" variable using the `mutate()` function, and the `case_when()` function that maps the conditions onto the desired variable values for "trade_level" using the following syntax:
+
+```{r}
+# Creates a new variable in the "pt_copy" dataset named "trade_level" (that is coded as "Low Trade" when the "trade" variable is greater than 15 and less than 50, coded as "Intermediate Trade" when "trade" is greater than or equal to 50 and less than 100, and coded as "High TradE" when "trade" is greater than or equal to 100), and then reorders the dataset such that "country", "trade_level", and "trade" are the first three variables in the dataset
+pt_copy<-pt_copy %>% mutate(trade_level=case_when(trade>15 & trade<50~"Low_Trade",
+                                      trade>=50 & trade<100~"Intermediate_Trade",
+                                                  trade>=100~"High_Trade")) %>% 
+                    relocate(country, trade_level, trade)
+```
+
+Check to see that the new "trade_level" variable has indeed been created in `pt_copy` according to the specifications above:
+
+```{r}
+#| eval: false
+# views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Creating dummy variables from categorical variables
+
+Sometimes, we may have a categorical variable in a dataset, and want to create dummy variables based on those categories. For example, consider the "trade_level" variable we created above. Let's say we want to use the "trade_level" column to create dummy variables for each of the categories in that column. We can do so with the *fastDummies* package, which can quickly generate dummy variables for the categories in a categorical variable using the `dummy_cols()` function. Below, we simply take the existing `pt_copy` dataset, and pass the name of the categorical variable out of which we want to create the dummies ("trade_level") to the `dummy_cols()` function:
+
+```{r}
+# Creates dummy variables from "trade_level" column, and relocates the new dummies to the front of the dataset
+pt_copy<-pt_copy %>% 
+  dummy_cols("trade_level") %>% 
+ relocate(country, trade_level, trade_level_High_Trade, trade_level_Intermediate_Trade, trade_level_Low_Trade)
+```
+
+Let's now view the updated `pt_copy` data frame, with the newly created dummy variables:
+
+```{r}
+#| eval: false
+# views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+You'll notice that there are now dummy variables corresponding to each of the categories in the categorical "trade_level" variable; for example, the "trade_level_High_Trade" dummy variable takes on the value of 1 for all observations where the "trade_level" variable is "High_Trade" and 0 otherwise; the "trade_level_Intermediate_Trade" dummy variable takes on the value of 1 for all observations where the "trade_level" variable is "Intermediate_Trade" and 0 otherwise; and so on.
+
 ### Subsetting (Filtering) Variables
+
+We will often want to subset, or "filter" our datasets to extract observations that meet specified criteria. The *dplyr* packages allows us to carry out these subsetting operations with a function called `filter()`, which takes various logical conditions as arguments. Let's say, for example, that we want to extract all of the OECD country observations from the `pt_copy` dataset. The "oecd" variable in `pt_copy` is equal to 1, for all OECD countries, and 0 for non-OECD countries. By passing the condition `oecd==1` to the `filter()` function, we can extract all OECD observations. We'll assign this data subset to a new object named `oecd_countries`, and view it in the data viewer:
+
+```{r}
+# Extracts OECD observations in "pt_copy" and assigns to object named "oecd_countries"
+oecd_countries<-pt_copy %>% filter(oecd==1) %>% 
+                            relocate(country, oecd)
+```
+
+```{r}
+#| eval: false
+# views "oecd_countries" in data viewer
+View(oecd_countries)
+
+```
+
+```{r}
+#| echo: false
+oecd_countries %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Let's take another example. Let's use the `filter()` function to extract all observations for which the "cgrev" (central government revenue as a share of GDP) exceeds 40. We'll assign the observations that satisfy this condition to a new object named `high_revenues`:
+
+```{r}
+# Extracts observations for which cgrev (central government revenue as % of gdp)>40, and assigns to object named "high_revenues"
+high_revenues<-pt_copy %>% filter(cgrev>40) %>% 
+                              relocate(country, cgrev)
+```
+
+```{r}
+#| eval: false
+# Views "high_revenues" in data viewer
+View(high_revenues) 
+```
+
+```{r}
+#| echo: false
+high_revenues %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Let's try another example. Let's subset observations from `pt_copy` for which the Catholic share of the population in 1980 ("catho80") is less than or equal to 50, and assign the filtered data to a new object named `minority_catholic`:
+
+```{r}
+# Extracts observations for which the "catho80" variable is less than or equal to 50
+minority_catholic<-pt_copy %>% filter(catho80<=50) %>% 
+                               relocate(country, catho80)
+```
+
+```{r}
+#| eval: false
+# Views "minority_catholic" in the data viewer
+View(minority_catholic)
+```
+
+```{r}
+#| echo: false
+minority_catholic %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+It is also possible to chain together multiple conditions as arguments to the `filter()` function. For example, if we want to subset observations from OECD countries that also have a federal political structure, we can use the "&" operator to specify these two conditions; we'll assign the filtered dataset to a new object named `oecd_federal_countries`:
+
+```{r}
+# Extracts federal OECD countries (where oecd=1 AND federal=1) and assigns to a new object named "oecd_federal_countries"
+oecd_federal_countries<-pt_copy %>% filter(oecd==1 & federal==1) %>% 
+                                      relocate(country, oecd, federal)
+```
+
+```{r}
+#| eval: false
+# Views "oecd_federal_countries" in data viewer
+View(oecd_federal_countries)
+```
+
+```{r}
+#| echo: false
+
+oecd_federal_countries %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+
+```
+
+We can use a vertical line (\|) to specify "or" conditions. For example, the code below subsets observations from countries in Africa OR countries in Asia/Europe, and assigns the subsetted data to a new object named `asia_europe_africa`:
+
+```{r}
+# Extracts observations that are in Africa ("africa") OR in Asia/Europe ("asiae) and assigns to an object named "asia_europe_africa"
+asia_europe_africa<-pt_copy %>% filter(continent=="africa"|continent=="asiae") %>% 
+                                  relocate(continent)
+```
+
+```{r}
+#| eval: false
+
+# views "asia_europe_africa" in data viewer
+View(asia_europe_africa)
+```
+
+```{r}
+#| echo: false
+# Prints contents of "asia_europe_africa"
+asia_europe_africa %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+It is also useful to know how to subset datasets to extract observations that do NOT meet a given condition. In particular, the condition "not equal to" is denoted by a "!=". For example, if we wanted to extract observations from `pt_copy` where the "continent" variable is NOT equal to "africa", and assign the result to a new object named `pt_copy_sans_africa`, we can write the following:
+
+```{r}
+# Extracts all non-Africa observations and assigns to object named "pt_copy_sans_africa"
+pt_copy_sans_africa<-pt_copy %>% filter(continent!="africa") %>% relocate(continent)
+```
+
+```{r}
+#| eval: false
+# views pt_copy_sans_africa in the data viewer
+View(pt_copy_sans_africa)
+```
+
+```{r}
+#| echo: false
+pt_copy_sans_africa %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
 
 # Elementary Data Analysis
 
 ## Computing Correlations
+
+### Computing a correlation coefficient
+
+```{r}
+# computes correlation coefficient between "trade" and "cgexp" variables and assigns the result to a new object named "trade_cgexp_cc"
+trade_cgexp_cc<-cor.test(pt_copy$trade, pt_copy$cgexp, use="complete.obs")
+```
+
+```{r}
+# prints results of "trade_cgexp_cc"
+trade_cgexp_cc
+```
+
+### Generating a correlation matrix
+
+```{r}
+# generating a correlation matrix
+# Extracts variables for which we want a correlation matrix
+desired_variables<-pt_copy %>% select(trade, cgexp, cgrev, catho80)
+```
+
+```{r}
+# Creates correlation matrix from "desired_variables" object and assigns to object named "cor_matrix"
+cor_matrix<-cor(desired_variables, use="complete.obs")
+```
+
+```{r}
+# prints contents of "cor_matrix"
+cor_matrix
+```
+
+```{r}
+stargazer(cor_matrix, type="text", title="Correlation Matrix", digits=3, out="outputs/corr_table.html")
+```
 
 ## Basic Regression Models
 
