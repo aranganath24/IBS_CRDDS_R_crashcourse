@@ -1,0 +1,1542 @@
+---
+title: "Analyzing and Visualizing Data in R"
+author: "Aditya Ranganath"
+format: 
+  html:
+    toc: true 
+    toc-depth: 2
+    toc-expand: 2
+    number-sections: true
+    number-depth: 3
+editor: visual
+---
+
+# Introduction
+
+In the past two sessions, we presented some ideas, concepts, and tools that provide a basic foundation for working with data in R. Now that we have this basic foundation, we'll turn in this session to a more applied exploration of some actual datasets. Our goal here is to introduce you to some useful functions that will allow you to explore and begin making sense of actual datasets in R. This lesson will provide a tour of various functions that can be particularly helpful as you get started cleaning, wrangling, and analyzing your data in R. Among the topics we'll cover today are:
+
+-   Loading data into R
+
+-   Handling missing data
+
+-   Summary Statistics in R
+
+-   Data cleaning and processing
+
+-   Basic analysis (correlations and regressions)
+
+-   Joining Data
+
+-   Reshaping Data
+
+-   Exporting data out of R
+
+We will be working with a handful of datasets, which you will need to [download](https://www.dropbox.com/scl/fo/2aianyhhdx92auh9aa6l2/AP1MzlzGD3KL2YBI-o9I4v4?rlkey=tm7z8sr0sxpjm5uquu154ni99&st=2a34xm00&dl=0). We will primarily be working with a crossnational dataset collected and made public by the economists Torsten Persson and Guido Tabellini; it's one of the datasets they work with in their highly influential book, entitled "The Economic Effects of Constitutions." The codebook for the dataset is provided along with the data in the downloaded materials. We'll also be working with some datasets collected from the World Bank's [World Development Indicators](https://databank.worldbank.org/source/world-development-indicators).
+
+# Installing Packages and Loading Libraries
+
+Please go ahead and install any of the packages below that you have not already installed.
+
+```{r chunk1}
+#| eval: FALSE
+
+# Install packages using the "install.packages" function
+install.packages("tidyverse")
+install.packages("psych")
+install.packages("janitor")
+install.packages("fastDummies")
+install.packages("stargazer")
+install.packages("gtsummary")
+install.packages("ggeffects")
+```
+
+Note that when you need to install a lot of packages at once, you can put the names of the packages you'd like to install into a character vector and pass it to the `install.packages()` function:
+
+```{r chunk2}
+#| eval: FALSE
+
+# Installing multiple packages by passing package names as strings to the "install.packages" function
+install.packages(c("tidyverse", "psych", "janitor", "fastDummies"))
+```
+
+Remember to load the required libraries (even packages you've already installed before).
+
+```{r test3}
+#| warning: FALSE
+#| message: FALSE
+# load libraries
+library(tidyverse)
+library(psych)
+library(janitor)
+library(fastDummies)
+library(janitor)
+library(summarytools)
+library(stargazer)
+library(gtsummary)
+library(ggeffects)
+```
+
+```{r}
+#| echo: false
+library(DT)
+```
+
+# Data Transfer Part 1: Reading Data into R
+
+If you haven't already, please download the [data for this session](https://www.dropbox.com/scl/fo/2aianyhhdx92auh9aa6l2/AP1MzlzGD3KL2YBI-o9I4v4?rlkey=ilmv8do8gcpmd8m43tbw2wxjp&st=7vg7mlxz&dl=0). Deposit the data into a local directory that you will use for the workshop.
+
+## Reading in Local Files
+
+Though it's not strictly necessary, it's useful to begin by setting your working directory to the location on your computer where the data is stored. The easiest way to do this is to go to the R Studio menu: click **Session**, then click **Set Working Directory**, then click **Choose Directory**. We can also set the working directory programmatically using the `setwd()` function.
+
+```{r test4}
+#| include: false
+setwd("/Users/adra7980/Library/CloudStorage/OneDrive-UCB-O365/Desktop/git-repositories/IBS_CRDDS_R_crashcourse/session3")
+```
+
+We can now pass the name of file and its extension in quotation marks to the `read_csv()` function (since the data we want to load is a CSV file). We'll assign it to an object named `pt` (after Persson and Tabellini):
+
+```{r}
+# reads in the workshop dataset (Persson and Tabellini cross-national dataset) by passing the file path as an argument to the "read_csv" and assigns it to a new object named "pt"
+pt<-read_csv("data/pt/persson_tabellini_workshop.csv")
+```
+
+Go ahead and view `pt` in the R Studio viewer.
+
+```{r}
+#| eval: FALSE
+
+# Views the dataset in the R Studio data viewer
+View(pt)
+```
+
+```{r}
+#| echo: false
+pt %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+## Reading in Data from Cloud Storage
+
+As you continue working in R, it may be helpful to read data in directly from cloud storage, rather than your local machine. It may take some effort to figure out how to do this (it will vary depending on your cloud storage provider) but it can be as simple as passing the link to your data to an R function. For example, an alternative way of reading the PT data into R is to paste the Dropbox link associated with the dataset to the `read_csv()` function. If you're reading in files from Dropbox, change the "0" at the end of the url to a 1 before reading it into R.
+
+```{r}
+read_csv("https://www.dropbox.com/scl/fo/2aianyhhdx92auh9aa6l2/AFfOXirAyGDi-xPC2c_gcDw/data/pt/persson_tabellini_workshop.csv?rlkey=ilmv8do8gcpmd8m43tbw2wxjp&e=1&dl=1")
+```
+
+# Processing, Wrangling, and Analyzing Numeric Data
+
+We'll start by making a copy of the `pt` object, by assigning it to a new object named `pt_copy`. We'll use `pt_copy` when exploring the dataset, which ensures that we do not make inadvertent changes to our original `pt` data frame, and can always refer back to it when needed. Keeping a "clean" version of the data, and carrying out analysis tasks on a copy of this dataset, is good data management practice.
+
+```{r}
+# makes a copy of "pt", called "pt_copy" that we can use for processing and analysis; keeps the original data frame, "pt" untouched
+pt_copy<-pt
+```
+
+## Missing Data
+
+Before proceeding, it's useful to have an orientation to how R handles missing data, which is a common feature of most social science datasets (including the data we're working with today). Let's work with a simple toy dataset for now; as an exercise, you'll be asked to perform analogous operations on the `pt_copy` dataset
+
+```{r}
+# makes toy dataset, assigned to object named "student_scores"
+student_scores<-data.frame(ID=c(1:5),
+                           Age=c(25, NA, 30, 22, NA),
+                           Score=c(85, 90, NA, 78, 88))
+```
+
+If we want to identify missing data, we can do so with the `is.na()` function, which returns a logical matrix with the value TRUE for missing values:
+
+```{r}
+# uses "is.na" to return a logical matrix indicating missing values (TRUE for missing values)
+is.na(student_scores)
+```
+
+If we want the total number of missing values in the dataset, we can take the sum of `is.na(student_scores)` :
+
+```{r}
+# calculates total number of missing values in "student_scores"
+sum(is.na(student_scores))
+```
+
+If we want the total number of missing values per column, we can pass `is.na(student_scores)` as an argument to the `colSum()` function, which we can do because in R, logical values can be used in numeric operations; when they're used in this way, `TRUE=1` and `FALSE=0`.
+
+```{r}
+# calculates total number of missing values per column
+colSums(is.na(student_scores))
+```
+
+If we wanted to calculate the percentage of missing data in the dataset, we could use our count of the number of NA values in the dataset `sum(is.na(student_scores))` and divide it by the total number of cells in the dataset, derived by multiplying the dataset's rows and columns:
+
+```{r}
+# calculates missing data percentage in "student_scores"
+# first calculates count of missing values and assigns it to "total_missing"
+total_missing<-sum(is.na(student_scores))
+# calculates total number of cells and assigns it to "total_values"
+total_values<-prod(dim(student_scores))
+# calculates percentage of missing data and assigns it to "missing_pct"
+missing_pct<-(total_missing/total_values)*100
+
+# prints contents of "missing_pct"
+missing_pct
+```
+
+Calculating the percentage of data missing in a dataset can be useful, and something we may want to do frequently, so it could be useful to wrap this code into a function, which we'll do below, and assign to a new object named `missing_data_percentage()`:
+
+```{r}
+# creates function to calculate the percentage of missing data in a dataset
+missing_data_percentage<-function(dataset){
+  # generates count of missing values
+  total_missing<-sum(is.na(dataset))
+  # calculates total number of cells
+  total_values<-prod(dim(dataset))
+  # calculates percentage of missing data
+missing_pct<-(total_missing/total_values)*100
+return(missing_pct)
+}
+
+```
+
+Let's test out the function on `student_scores`:
+
+```{r}
+# passes "student_scores" as an argument to custom function "missing_data_percentage" which yields the percentage of missing data in the "student_scores" dataset
+missing_data_percentage(student_scores)
+```
+
+We can now use this function for any other datasets we might create or work with, without having to retype a bunch of code. For example, if we wanted to calculate the percentage of missing data in `pt_copy`, we could pass it as an argument to `missing_data_percentage`:
+
+```{r}
+# calculates missing data percentage in pt_copy
+missing_data_percentage(pt_copy)
+```
+
+It could also be useful to get a sense of the missing data percentage per column. We can do so with the following:
+
+```{r}
+# calculates percentage of missing data per column in "student_scores" and assigns the resulting vector to an object named "missing_pct_per_col"
+missing_pct_per_col<-colSums(is.na(student_scores))/nrow(student_scores)*100
+
+# prints contents of "missing_pct_per_col"
+missing_pct_per_col
+```
+
+If we want to remove missing data, the `drop_na()` function from the *tidyverse* is useful. The `drop_na()` function will remove all rows from the dataset with NA values in any column:
+
+```{r}
+# removes all rows with NA values from "student_scores"
+drop_na(student_scores)
+```
+
+The default behavior of the `drop_na()` function is to drop all rows with NA values in any column (i.e. only rows with complete data are kept in the dataset). However, it's possible to change this default behavior by specifying column/variable names after passing the data frame object as an argument; when we do this, `drop_na()` no longer drops all rows with missing data in any column, but all rows with missing data in any specified column. For example, the code below drops all rows where "Age" values are NA, but not all rows where "Score" scores are NA
+
+```{r}
+# removes all rows where "Age" has NA values in "student_scores"
+drop_na(student_scores, Age)
+```
+
+If, instead, we specify "Score" as an argument, the function drops all rows where "Score" values are NA, but not all rows where "Age" values are NA.
+
+```{r}
+# removes all rows where "Score" has NA values in "student_scores"
+drop_na(student_scores, Score)
+```
+
+Note that we can specify more than one column argument to `drop_na()`, in which case rows which have NA values associated with those specified columns will be dropped, but rows which have NA values with other (non-specified) columns are kept.
+
+Imputing missing values is a complex topic beyond the scope of our workshop, but it's worth briefly noting that for whatever reason, NA values may be incorrectly coded, or placeholders for other values. For example, you may know from a dataset's codebook, or from context, that for a particular column in the dataset, observations that appear as missing/NA should actually be coded as "0". We can use the `replace_na()` function to replace such NA values with their proper values. For example, let's say that NA values in the "Score" column should actually be "0" (perhaps NA was being used as a placeholder, and needs to be converted to 0 since the student never turned in their assignment). In the `replace_na()` function, the first argument is the name of the data frame object, while the second is a list that indicates the column(s) with NA values that need replacement, and a specification for what they will be replaced with. In our case, the syntax looks something like this:
+
+```{r}
+# replace NA values in the "Score" column with 0
+replace_na(student_scores, list(Score=0))
+```
+
+Finally, it's important to note that functions like `mean()` and `sum()` will return NA if there are missing values. For example:
+
+```{r}
+# calculates mean of "Score" (NA values are not excluded; default behavior)
+mean(student_scores$Score)
+```
+
+```{r}
+# calculates mean of "Score" (NA values are excluded due to na.rm=TRUE specification; as a result, the function computes an average based on non-NA values)
+mean(student_scores$Score, na.rm=TRUE)
+```
+
+When working in R, different packages or functions may handle missing data differently, so it's useful to consult the documentation of the packages you use for more information (especially when something is not working as expected).
+
+## Summary Statistics
+
+Once we have a dataset loaded into R, one of the first things we'll likely want to do after taking a look at the dataset in the viewer with the `View()` function is to get a sense of are data by calculating some summary statistics. This section reviews some summary statistics functions and tools we can call on for this purpose.
+
+### Summary Statistics Tables
+
+A quick way to generate a table of summary statistics is to use the `describe()` function from the *psych* package. Below, we’ll generate summary statistics for the `pt_copy` dataset by passing `pt_copy` as an argument to the `describe()` function, and assign the resulting table of summary statistics to a new object named `pt_copy_summarystats1`.
+
+```{r}
+# Generate summary statistics for "pt_copy" and assign table of summary statistics to a new object named "pt_copy_summarystats1"
+pt_copy_summarystats1<-describe(pt_copy)
+```
+
+Let's go ahead and view the table of summary statistics. We can print the object to our console:
+
+```{r}
+# prints contents of "pt_copy_summarystats1" to console
+pt_copy_summarystats1
+```
+
+Or, alternatively (and preferably), we can view the table in the data viewer:
+
+```{r}
+#| eval: false
+# prints contents of "pt_copy_summarystats1" to console
+View(pt_copy_summarystats1)
+```
+
+```{r}
+#| echo: false
+pt_copy_summarystats1 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+To learn more about the `describe()` function, or any function you use in R, recall that you can query the function's documentation by printing a `?` following by the function's name in the console (or executing it within a script). For example:
+
+```{r}
+?describe
+```
+
+One thing to note here is that the function defaults to setting `na.rm=TRUE`; under this setting, the `describe()` function simply omits NA (i.e. missing) values when calculating summary statistics. If, instead, `na.rm=FALSE`, the function deletes all rows that contain missing data, and calculates summary statistics with reference to this truncated dataset that has been excised of missing values. In practical terms, it will typically make the most sense to go with the default `na.rm=TRUE` option, but it's important to be clear about these different options for handling missing data in the context of the `describe()` function. If you're still struggling to understand the difference, we can consider a simple example with a made-up toy dataset. Let's first create this dataset:
+
+```{r}
+# creates toy dataset for illustrative purposes and assigns it to object named "df_sample"
+df_sample<-data.frame(Country=c("A", "B", "C", "D"),
+                      Variable1=c(10, NA, 15, 20),
+                      Variable2=c(5, 8, 12, NA))
+
+# prints contents of "df_sample"
+df_sample
+```
+
+Let's now generate a summary statistics table using `describe()` with the default `na.rm=TRUE` setting and assign it to an object named `df_sample_summary_default:`
+
+```{r}
+# generates summary statistics with describe function and assigns it to "df_sample_summary_default"; na.rm=TRUE ignores NA values when calculating summary statistics
+df_sample_summary_default<-describe(df_sample, na.rm=TRUE)
+```
+
+Go ahead and view `df_sample_summary_default` in the data viewer:
+
+```{r}
+#| eval: false
+View(df_sample_summary_default)
+```
+
+```{r}
+#| echo: false
+df_sample_summary_default %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Note for example, that the mean of "Variable1" is 15 (i.e. the average of 10, 15, and 20) while the mean of "Variable2" is 12.5 (i.e. the average of 5, 8, and 12). When computing these averages, the `describe()` function simply ignores "NA", i.e. missing values. Now, let's use `describe()` to generate a summary statistics table, but set `na.rm=FALSE` ; we'll assign it to an object named `df_sample_summary_B` :
+
+```{r}
+# generates summary statistics with describe function and assigns it to "df_sample_summary_B"; na.rm=FALSE removes rows with any NA values before calculating summary statistics (in other words, summary statistics are computed on rows with complete data)
+df_sample_summary_B<-describe(df_sample, na.rm=FALSE)
+```
+
+Go ahead and inspect the summary table using the `View()` function:
+
+```{r}
+#| eval: false
+View(df_sample_summary_B)
+```
+
+```{r}
+#| echo: false
+df_sample_summary_B %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Note that the mean of "Variable1" is now 12.5 (the average of 10 and 15), because the `na.rm=FALSE` command removed both rows 1 and 3 in `df_sample` before performing the calculation, since both of these rows have an `NA` value in them. Similarly, the mean of "Variable2" is now 8.5 (the average of 5 and 12).
+
+For the sake of argument, let's say you want to only calculate summary statistics for *columns* that have no missing values. The `describe()` function doesn't allow you to do this by specifying an argument, but we can carry out this task by writing a custom function. First, let's write a function that checks whether a vector has any missing values; we'll assign this object to a new object named `check_na().` This function takes a column as an input, and returns a logical condition `TRUE` if there are any NA values in the column and `FALSE` if there are no NA values in the column:
+
+```{r}
+# writes a function that takes a column as input and checks whether there are any NA values in that column; returns TRUE if there is, FALSE otherwise
+check_na<-function(column){
+  any(is.na(column))
+}
+
+```
+
+Let's test the function for a few columns in our dataset
+
+```{r}
+check_na(pt_copy$country)
+```
+
+```{r}
+check_na(pt_copy$graft)
+```
+
+That worked. Now, let's call on the `discard()` function, which is part of the *purrr* package we're now familiar with; it removes a vector from a list if some condition is met. We'll pass `pt_copy` and our `check_na()` function as arguments to it. In particular, the code below uses the `discard()` function to run the `check_na()` function across each column in `pt_copy;` if a column does have an NA value (i.e. evaluates to TRUE when the `check_na()` function is passed to it), it is "discarded", but if it does not have an NA value (i.e. evaluates to FALSE when the `check_na()` function is passed to it), it is kept. We're left with a version of `pt_copy()` without any columns that have NA values, which we'll assign to a new object named `pt_copy_NAcolumns_removed`:
+
+```{r}
+# discards columns in "pt_copy" that have missing data/NA Values, and assigns the resulting data frame to a new object named "pt_copy_NAcolumns_removed"
+pt_copy_NAcolumns_removed<-discard(pt_copy, check_na)
+```
+
+We can confirm that all of the columns with NA values have been removed by passing `pt_copy_NAcolumns_removed` to the `View()` function:
+
+```{r}
+#| eval: false
+View(pt_copy_NAcolumns_removed)
+```
+
+```{r}
+#| echo: false
+pt_copy_NAcolumns_removed %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Now, we can pass `pt_copy_NAcolumns_removed` as an argument to the `describe()` function, and thereby generate a table of summary statistics for only variables without any missing observations. Below, we'll assign this table of summary statistics to a new object named `pt_copy_NAcolumns_removed_summarystats`:
+
+```{r}
+# passes "pt_copy_NAcolumns_removed" as an argument to "describe" function, which generates summary statistics only for variables without missing observations; the table of summary statistics is assigned to a new object named "pt_copy_NAcolumns_removed_summarystats"
+pt_copy_NAcolumns_removed_summarystats<-describe(pt_copy_NAcolumns_removed)
+```
+
+Let's go ahead and view this table in the data viewer:
+
+```{r}
+#| eval: false
+View(pt_copy_NAcolumns_removed_summarystats)
+```
+
+```{r}
+#| echo: false
+pt_copy_NAcolumns_removed_summarystats %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Let's say, for the sake of argument, that we will be working with a lot of datasets, and you will want to quickly generate tables of summary statistics that exclude variables that have missing values. We don't want to go through these steps all the time, so we can wrap this code into a function that takes a dataset as an input, and returns a table of summary statistics that excludes information on variables with missing values:
+
+```{r}
+# creates function to take dataset input and return a table of summary statistics only for variables that have no missing values
+summary_stats_noNAcolumns<-function(dataset_input){
+  cleaned_dataset<-discard(dataset_input, check_na)
+  cleaned_summary_stats<-describe(cleaned_dataset)
+  return(cleaned_summary_stats)
+}
+  
+```
+
+Now, we can simply pass a dataset as an argument to our custom `summary_stats_noNAcolumns` function, and it will return a summary statistics table with these desired specifications. Test this function out on `pt_copy` to confirm it works:
+
+```{r}
+#| eval: false
+# passes "pt_copy" as argument to "summary_stats_noNAcolumns" function
+summary_stats_noNAcolumns(pt_copy)
+```
+
+```{r}
+#| echo: false
+head(summary_stats_noNAcolumns(pt_copy))
+```
+
+For further confirmation, create a toy dataset and pass it as an argument to `summary_stats_noNAcolumns()` to ensure that it works as expected.
+
+It might be the case that the summary statistics table created by `describe()` does not contain information you'd like, in which case it may be possible to customize it to provide that information. For example, it could be nice to have a column in the summary statistics table that provides information on the number of NA values there are for each variable. To get that information into the summary statistics table, we'll first write a function to count the number of NA values in a vector:
+
+```{r}
+# Define a named function to count missing values
+count_missing <- function(x) {
+  sum(is.na(x))
+}
+```
+
+Next, we'll apply this function to each column/variable in `pt_copy`, and deposit the number of missing values for each column in a vector, such that the number of missing values in the first column is deposited as the first element in the vector, the number of missing values in the second column is deposited as the second element in the vector, and so on; we'll assign this vector to a new object named `missing_values_vector`:
+
+```{r}
+# applies "count_missing" function to the columns of "pt_copy", and deposits the results (i.e. count of missing values in each column of "pt_copy") to a numeric vector assigned to the object "missing_values_vector"
+missing_values_vector <- map_dbl(pt_copy, count_missing)
+```
+
+Now, we'll add this vector to `pt_copy_summarystats1`:
+
+```{r}
+# adds "missing_values_vector" as a column named "missing" to "pt_copy_summarystats1" summary stats table
+pt_copy_summarystats1$missing<-missing_values_vector
+```
+
+View `pt_copy_summarystats1` in the data viewer to confirm that the column has been successfully added:
+
+```{r}
+#| eval: false
+View(pt_copy_summarystats1)
+```
+
+```{r}
+#| echo: false
+pt_copy_summarystats1 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Below, we'll learn another way of adding new columns to datasets that draws on the *tidyverse*; the syntax above is from base R.
+
+Finally, there may be instances in which the summary statistics table produced by the `describe()` function provides unwanted information. For example, the summary statistics table provides summary statistics for categorical variables as well as numeric ones, but quantitative summary statistics for categorical information may not be meaningful, and simply clutter things. What if we want to remove categorical variables from the table of summary statistics?
+
+We can first use the `select_if()` function from *dplyr* (a data-wrangling package that is part of the *tidyverse* suite) to select only the numeric columns in `pt_copy`. We'll assign this "numeric only" version of `pt_copy` to a new object named `pt_copy_numeric`:
+
+```{r}
+# selects columns from "pt_copy" that are numeric
+pt_copy_numeric<-select_if(pt_copy, is.numeric)
+```
+
+We can confirm that `pt_copy_numeric` only contains numeric variables:
+
+```{r}
+#| eval: false
+# views "pt_copy_numeric" in data viewer
+View(pt_copy_numeric)
+```
+
+```{r}
+#| echo: false
+pt_copy_summarystats1 %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Before proceeding, it's useful to note that there are other summary statistics packages that are worth exploring. For example, the *summarytools* package provides the `descr()` , which is similar to `describe()` from the *psych* package. The *summarytools* package defaults to providing information as a matrix, which we haven't covered, so we pass `descr(pt_copy)` to the `as.data.frame()` function to get the summary statistics table output as a data frame.
+
+```{r}
+# uses "descr" function from summarytools package to create a table of summary statistics as a data frame and assigns it to "pt_summary_ST"
+pt_summary_ST<-as.data.frame(descr(pt_copy))
+```
+
+```{r}
+#| eval: false
+# views "pt_copy_numeric" in data viewer
+View(pt_summary_ST)
+```
+
+Another handy package for generating summary statistics is *stargazer*, which is most useful for creating and exporting regression tables, but which can also produce a well-formatted summary statistics table that is ready to be exported. We can use *stargazer* to create a summary statistics table with the following (we'll export it in a later section):
+
+```{r}
+# uses stargazer package to generate summary statistics for pt_copy
+stargazer(as.data.frame(pt_copy), type = "text")
+```
+
+## Frequency Tables and Crosstabs
+
+For qualitative data, it can be especially useful to generate frequency tables, which we can do with the `freq()` function:
+
+```{r}
+# creates frequency table for the continent variable
+freq(pt_copy$continent)
+```
+
+Cross-tabs, which show the frequency distribution of two or more categorical variables, are another useful way to begin exploring your data; one useful function for generating crosstabs in R is the `table()` function, that takes dataset columns as arguments.
+
+```{r}
+# creates crosstab with continent and federal variables
+table(pt_copy$continent, pt_copy$federal)
+```
+
+The cross tab above quickly tells us, for example, that countries in the "asiae" category (Asia and Europe) have 2 countries with a federal structure of government and 11 without it, while countries in the "laam" category (Latin America) have 4 countries with a federal structure of government and 19 without it.
+
+## Group-Level Summary Statistics
+
+While having a simple table of summary statistics is a useful starting point, it is often useful to generate group-level summary statistics, where summary statistics are presented for different subgroups in the dataset. One way to generate group summary statistics is to use the `describeBy()` function (also from the *psych* package), where the first argument is the data frame you would like to generate group-level summary statistics for, and the second argument is the column that contains the relevant groups. Below, we generate summary statistics for `pt_copy` parsed out by the different continents in the "continent" column. The expression `pt_copy$continent` indicates that the groups with respect to which we want to calcualte the summary statistics is in the "continent" column of the `pt_copy` data frame. More generally, we can explicitly refer to columns in an R data frame using this dollar-sign notation, where the expression before the dollar sign refers to the data frame object, and the expression after refers to the name of the column.
+
+The `describeBy()` function will produce a list that contains summary statistics for different groups as list elements. Below, we'll assign the list of group summary statistics to a new object named `summary_stats_by_continent`:
+
+```{r}
+# Creates summary statistics for each continent grouping, and puts results in list named "summary_stats_by_continent"
+summary_stats_by_continent<-describeBy(pt_copy, pt_copy$continent)
+```
+
+Now, let's say we want to extract the summary statistics for Africa, one of the continent categories in the "continent" column. We can do so using the double-bracket notation we discussed above:
+
+```{r}
+#| eval: false
+# Accessing continent-level summary statistics for africa from the "summary_stats_by_continent" list
+summary_stats_by_continent[["africa"]]
+```
+
+```{r}
+#| echo: false
+head(summary_stats_by_continent[["africa"]])
+
+```
+
+Recall that we can assign list elements that we extract from a list to their own object, which allows us to conveniently retrieve it whenever it is needed. Below, we'll assign the summary statistics for Africa to a new object named `africa_summary`:
+
+```{r}
+# Group-level summary statistics can be assigned to their own object for easy retrieval
+africa_summary<-summary_stats_by_continent[["africa"]]
+```
+
+Another convenient way to extract group-level statistics is with the *dplyr* package's `group_by()` function. First, we'll run the code below, and assign it to a new object named `trade_age_by_continent`:
+
+```{r}
+# Generate a table that displays summary statistics for trade at the continent level and assign to object named "trade_age_by_continent"
+trade_age_by_continent<-pt_copy %>% 
+                          group_by(continent) %>% 
+                            summarise(meanTrade=mean(trade),sdTrade=sd(trade),
+                                      meanAge=mean(age), sdAge=sd(age),
+                                      n=n())
+```
+
+Let's now print the contents of `trade_age_by_continent`:
+
+```{r}
+# prints contents of "trade_age_by_continent"
+trade_age_by_continent
+```
+
+Let's now unpack the code that created this table. We started with the `pt_copy` data frame, and then used `group_by(continent)` to declare that subsequent calculations should be performed at the continent-level; then, within the `summarise()` function, we defined the column names we wanted to use in the group-level summary table, and how those variables are to be calculated. For example, `meanTrade=mean(trade)` indicates that we want the first column to be named "meanTrade", which is to be calculated by taking the mean of the "trade" variable for each continent grouping. After that, `sdTrade=sd(trade)` indicates that we want the second column to be named "sdTrade", which is to be calculated by taking the standard deviation of the "trade" variable for each continent grouping. And so on. Note that `n=n()` indicates that we want the final column, named "n", to provide information about the number of observations in each continent-level grouping.
+
+You might have noticed a mysterious symbol in the above code that comes immediately after `pt_copy`, and immediately after `group_by(continent)`. This symbol is known as a “pipe” (`%>%`). The pipe operator effectively takes the contents to its left, and then uses these contents as an input to the code on its right. Above, the pipe takes the contents of `pt_copy` on its left, and then feeds this data into the `group_by()` function on the right; then, after grouping the data by continent, it feeds this grouped data on its left into the `summarise()` function on its right. We will use the pipe operator throughout the lesson to chain together functions in this manner.
+
+## Data Cleaning and Wrangling
+
+After getting a sense of your data by computing some summary statistics and running some crosstabs, you'll often have a sense of how you would like to clean or transform your data for analysis. This section briefly describes some functions that are useful for these basic data-preparation and wrangling tasks. Most of these functions are from the *tidyverse*'s *dplyr* package.
+
+### Rearranging Columns
+
+We can manipulate the order of the columns in a dataset using the `relocate` function. For example, the code below uses the `relocate()` function to shift the "country" column to the front of the dataset, and then assigns this change back to `pt_copy` to update the object:
+
+```{r}
+# bring the "country" column to the front of the dataset
+pt_copy<-pt_copy %>% relocate(country)
+```
+
+Go ahead and confirm that the change has been implemented by viewing `pt_copy` in the data viewer:
+
+```{r}
+#| eval: false
+# Views "pt_copy" in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+We can specify more than one argument to the `relocate` function. For example, in the code below, passing the "country", "list", "trade", and "oecd" variables/columns to the `relocate()` function will make "country" the first column, "list" the second column, "trade" the third column, and so on.
+
+```{r}
+# bring the "country", "list", "trade", "oecd" columns to the front of the dataset
+pt_copy<-pt_copy %>% relocate(country, list, trade, oecd)
+```
+
+Let's go ahead and view the updated dataset in the R Studio Viewer:
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Renaming Variables
+
+In order to rename variables, we can use the `rename()` function, as below. The code below renames the existing "list" variable to "party_list", which is more descriptive, and assigns the change back to the `pt_copy` object.
+
+```{r}
+## Renaming a variable (renames "list" to "party_list")
+pt_copy<-pt_copy %>% rename(party_list=list)
+```
+
+Let's check the `pt_copy` data frame in the viewer to ensure that the change has been made.
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+You can rename more than one variable at a time using the `rename()` function; simply separate the arguments by a comma. For example, if we wanted to also change the variable currently named "ctrycd" to "country_code", in addition to changing "list" to "party_list", we could use the following expression: `pt_copy<-pt_copy %>% rename(party_list=list, country_code=ctrycd)`
+
+### Sorting Datasets With Respect to Variables
+
+It is often useful to sort a data frame in ascending or descending order with respect to a given variable. The code below sorts the `pt_copy` data frame in ascending order with respect to the "trade" variable using the `arrange()` function:
+
+```{r}
+# sorting in ascending (low to high) order with respect to the "trade" variable
+pt_copy<-pt_copy %>% arrange(trade)
+```
+
+If, instead, you want to sort the dataset in descending order with respect to the "trade" variable, pass the name of the variable to the `desc()` function within the `arrange()` function, as below:
+
+```{r}
+# sorting in descending (high to low) order with respect to the "trade" variable
+pt_copy<-pt_copy %>% arrange(desc(trade))
+```
+
+Note that it's also possible to pass several arguments to the arrange function, and thereby sort a dataset with respect to multiple variables; for example, the code below first relocates the "continent" column and the "trade" column towards the front of the dataset (just after "Country), then sorts the dataset by continent, and then further sorts it in descending order by trade. This allows us to quickly note the country in each continent grouping with the highest value on the "trade" variable.
+
+```{r}
+# takes the "pt_copy" dataset, relocates "country", "continent", and "trade" to the front of the dataset, and then arranges the dataset based on the "continent" variable, then in descending order with respect to the "trade" variable
+pt_copy<-pt_copy %>% 
+        relocate(country, continent, trade) %>% 
+        arrange(continent, desc(trade))
+```
+
+Let's go ahead and see what this looks like using the Viewer:
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Sorting a dataset with respect to more than one variable can be especially useful in certain contexts, particularly in cases where you're dealing with nested data. For example, in a time series dataset, it can be useful to first sort by year, then by months within the year. In a dataset with regional information, it could be helpful to first sort by regional, then by cities within those regional groupings.
+
+### Creating New Variables Based on Existing Variables
+
+Depending on your research question and empirical strategy, it is often useful or necessary to create new variables in your dataset, based on existing variables. To do so, we can use *dplyr's* `mutate()` function. The code below, for example, uses the `mutate()` function to create a new variable, named "non_catholic_80", that is computed by subtracting the existing "catho80" variable from 100; for convenience, the "country", "catho80", and newly created "non_catholic_80" variables are all moved to the front of the dataset using the `relocate()` function:
+
+```{r}
+# Create new variable named "non_catholic_80" that is calculated by substracting the Catholic share of the population in 1980 ("catho80") from 100  and relocates "country", "catho80", and the newly created "non_catholic_80" to the front of the dataset
+pt_copy<-pt_copy %>% mutate(non_catholic_80=100-catho80) %>% 
+                     relocate(country, catho80, non_catholic_80)
+```
+
+We can view the updated `pt_copy` data frame to confirm that the new variable has been created:
+
+```{r}
+#| eval: false
+# Views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Note that it's possible to define more than one new variable at a time using `mutate()`; simply separate the arguments by a comma within the `mutate()` function.
+
+### Selecting or Deleting Variables
+
+Sometimes, we will have a dataset with many variables, and to make things more tractable, we'll want to select only the variables that are relevant to our analysis. we can explicitly select desired variables using the `select()` function from *dplyr*. The code below selects the "country", "cgexp", "cgrev", "trade", and "federal" columns from `pt_copy`, and then assigns this selection to a new object named `pt_copy_selection`:
+
+```{r}
+# Selects "country", "cgexp", "cgrev", and "trade" variables from the "pt_copy" dataset and assigns the selection to a new object named "pt_copy_selection"
+pt_copy_selection<-pt_copy %>% 
+                    select(country, cgexp, cgrev, trade, federal)
+```
+
+When we view the `pt_copy_selection` object in the data viewer, we'll see that we now have a new data frame that consists only of these variables:
+
+```{r}
+#| eval: false
+# views "pt_copy_selection" in data viewer
+View(pt_copy_selection)
+```
+
+```{r}
+#| echo: false
+# prints updated contents of "pt_copy"
+pt_copy_selection %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Sometimes, it could make more sense to directly delete columns, instead of deciding on which ones to keep or select. For example, the code below deletes the "federal" variable from `pt_copy_selection` by passing it to the `select()` column with a "-" in front of it.
+
+```{r}
+# deletes "federal" variable from "pt_copy_selection"
+pt_copy_selection %>% select(-federal)
+```
+
+If you want to delete multiple columns, simply specify the columns in a vector, preceded by a minus sign, that is passed to the `select()` function. The code below, for instance, takes the existing `pt_copy_selection` data frame, deletes the "federal" and "trade" columns, and assigns the result to a new object named `pt_copy_selection_modified`:
+
+```{r}
+# deletes "federal" and "trade" from "pt_copy_selection" and assigns it to new object named "pt_copy_selection_modified"
+pt_copy_selection_modified<-pt_copy_selection %>% select(-c(federal, trade))
+```
+
+Check the `pt_copy_selection_modified` data frame in the data viewer to confirm these changes:
+
+```{r}
+#| eval: false
+# views "pt_copy_selection_modified" in data viewer
+View(pt_copy_selection_modified)
+```
+
+```{r}
+#| echo: false
+pt_copy_selection_modified %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Recoding Variables
+
+"Recoding" a variable refers to the process of taking an existing variable, and generating new variable(s) that represent the information from that original variable in a new way. Below, we'll consider some common recoding operations.
+
+### Creating Dummy Variables from Continuous Numeric Variables
+
+You may sometimes have a continuous numeric variable, but want to create a new dummy variable (a variable that takes on the value of 1 if a given condition is met, and 0 otherwise) based on that numeric variable. For example, let's say we want to create a new variable, named "trade_open" that takes on the value of 1 if the trade variable is greater than or equal to 77, and 0 otherwise. We can generate this new dummy variable using the `mutate()` function; within the `mutate()` function below, we specify that we want to create a new variable named "trade_open"; the `ifelse()` function specifies the desired condition (trade\>=77), followed by the value the new "trade_open" variable is to take if the condition is met (1), and the value the new "trade_open" variable is to take if the condition is not met (0). In other words, we can translate `ifelse(trade>=77, 1, 0)` to "if trade\>=77, set the 'trade_open' variable to 1, otherwise set it to 0." We'll assign the data frame with the new "trade_open" variable back to "pt_copy":
+
+```{r}
+# Creates a new dummy variable based on the existing "trade" variable named "trade_open" (which takes on a value of "1" if "trade" is greater than or equal to 77, and 0 otherwise) and then moves the newly created variable to the front of the dataset along with "country" and "trade"; all changes are assigned to "pt_copy", thereby overwriting the existing version of "pt_copy"
+
+pt_copy<-pt_copy %>% mutate(trade_open=ifelse(trade>=77, 1, 0)) %>% 
+                     relocate(country, trade_open, trade)
+```
+
+View the data frame to ensure that the new variable "trade_open", recoded based on "trade", has been created:
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Creating categorical variables from continuous numeric variables
+
+Sometimes, we will want to create a variable that contains categories or classifications that derive from numeric thresholds of an existing variable. For instance, let's say we want to take the existing "trade" variable, and define a new variable named "trade_level", which is set to "Low Trade" when the "trade" variable is greater than 15 and less than 50; "Intermediate_Trade" when the "trade" variable is greater than or equal to 50 and less than 100; and "High_Trade" when the "trade" variable is greater than or equal to 100. The code below creates this new "trade_level" variable using the `mutate()` function, and the `case_when()` function that maps the conditions onto the desired variable values for "trade_level" using the following syntax:
+
+```{r}
+# Creates a new variable in the "pt_copy" dataset named "trade_level" (that is coded as "Low Trade" when the "trade" variable is greater than 15 and less than 50, coded as "Intermediate Trade" when "trade" is greater than or equal to 50 and less than 100, and coded as "High TradE" when "trade" is greater than or equal to 100), and then reorders the dataset such that "country", "trade_level", and "trade" are the first three variables in the dataset
+pt_copy<-pt_copy %>% mutate(trade_level=case_when(trade>15 & trade<50~"Low_Trade",
+                                      trade>=50 & trade<100~"Intermediate_Trade",
+                                                  trade>=100~"High_Trade")) %>% 
+                    relocate(country, trade_level, trade)
+```
+
+Check to see that the new "trade_level" variable has indeed been created in `pt_copy` according to the specifications above:
+
+```{r}
+#| eval: false
+# views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+```{r}
+#| echo: false
+pt_copy %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Creating dummy variables from categorical variables
+
+Sometimes, we may have a categorical variable in a dataset, and want to create dummy variables based on those categories. For example, consider the "trade_level" variable we created above. Let's say we want to use the "trade_level" column to create dummy variables for each of the categories in that column. We can do so with the *fastDummies* package, which can quickly generate dummy variables for the categories in a categorical variable using the `dummy_cols()` function. Below, we simply take the existing `pt_copy` dataset, and pass the name of the categorical variable out of which we want to create the dummies ("trade_level") to the `dummy_cols()` function:
+
+```{r}
+# Creates dummy variables from "trade_level" column, and relocates the new dummies to the front of the dataset
+pt_copy<-pt_copy %>% 
+  dummy_cols("trade_level") %>% 
+ relocate(country, trade_level, trade_level_High_Trade, trade_level_Intermediate_Trade, trade_level_Low_Trade)
+```
+
+Let's now view the updated `pt_copy` data frame, with the newly created dummy variables:
+
+```{r}
+#| eval: false
+# views updated "pt_copy" data frame in data viewer
+View(pt_copy)
+```
+
+You'll notice that there are now dummy variables corresponding to each of the categories in the categorical "trade_level" variable; for example, the "trade_level_High_Trade" dummy variable takes on the value of 1 for all observations where the "trade_level" variable is "High_Trade" and 0 otherwise; the "trade_level_Intermediate_Trade" dummy variable takes on the value of 1 for all observations where the "trade_level" variable is "Intermediate_Trade" and 0 otherwise; and so on.
+
+### Subsetting (Filtering) Variables
+
+We will often want to subset, or "filter" our datasets to extract observations that meet specified criteria. The *dplyr* packages allows us to carry out these subsetting operations with a function called `filter()`, which takes various logical conditions as arguments. Let's say, for example, that we want to extract all of the OECD country observations from the `pt_copy` dataset. The "oecd" variable in `pt_copy` is equal to 1, for all OECD countries, and 0 for non-OECD countries. By passing the condition `oecd==1` to the `filter()` function, we can extract all OECD observations. We'll assign this data subset to a new object named `oecd_countries`, and view it in the data viewer:
+
+```{r}
+# Extracts OECD observations in "pt_copy" and assigns to object named "oecd_countries"
+oecd_countries<-pt_copy %>% filter(oecd==1) %>% 
+                            relocate(country, oecd)
+```
+
+```{r}
+#| eval: false
+# views "oecd_countries" in data viewer
+View(oecd_countries)
+
+```
+
+```{r}
+#| echo: false
+oecd_countries %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Let's take another example. Let's use the `filter()` function to extract all observations for which the "cgrev" (central government revenue as a share of GDP) exceeds 40. We'll assign the observations that satisfy this condition to a new object named `high_revenues`:
+
+```{r}
+# Extracts observations for which cgrev (central government revenue as % of gdp)>40, and assigns to object named "high_revenues"
+high_revenues<-pt_copy %>% filter(cgrev>40) %>% 
+                              relocate(country, cgrev)
+```
+
+```{r}
+#| eval: false
+# Views "high_revenues" in data viewer
+View(high_revenues) 
+```
+
+```{r}
+#| echo: false
+high_revenues %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Let's try another example. Let's subset observations from `pt_copy` for which the Catholic share of the population in 1980 ("catho80") is less than or equal to 50, and assign the filtered data to a new object named `minority_catholic`:
+
+```{r}
+# Extracts observations for which the "catho80" variable is less than or equal to 50
+minority_catholic<-pt_copy %>% filter(catho80<=50) %>% 
+                               relocate(country, catho80)
+```
+
+```{r}
+#| eval: false
+# Views "minority_catholic" in the data viewer
+View(minority_catholic)
+```
+
+```{r}
+#| echo: false
+minority_catholic %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+It is also possible to chain together multiple conditions as arguments to the `filter()` function. For example, if we want to subset observations from OECD countries that also have a federal political structure, we can use the "&" operator to specify these two conditions; we'll assign the filtered dataset to a new object named `oecd_federal_countries`:
+
+```{r}
+# Extracts federal OECD countries (where oecd=1 AND federal=1) and assigns to a new object named "oecd_federal_countries"
+oecd_federal_countries<-pt_copy %>% filter(oecd==1 & federal==1) %>% 
+                                      relocate(country, oecd, federal)
+```
+
+```{r}
+#| eval: false
+# Views "oecd_federal_countries" in data viewer
+View(oecd_federal_countries)
+```
+
+```{r}
+#| echo: false
+
+oecd_federal_countries %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+
+```
+
+We can use a vertical line (\|) to specify "or" conditions. For example, the code below subsets observations from countries in Africa OR countries in Asia/Europe, and assigns the subsetted data to a new object named `asia_europe_africa`:
+
+```{r}
+# Extracts observations that are in Africa ("africa") OR in Asia/Europe ("asiae) and assigns to an object named "asia_europe_africa"
+asia_europe_africa<-pt_copy %>% filter(continent=="africa"|continent=="asiae") %>% 
+                                  relocate(continent)
+```
+
+```{r}
+#| eval: false
+
+# views "asia_europe_africa" in data viewer
+View(asia_europe_africa)
+```
+
+```{r}
+#| echo: false
+# Prints contents of "asia_europe_africa"
+asia_europe_africa %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+It is also useful to know how to subset datasets to extract observations that do NOT meet a given condition. In particular, the condition "not equal to" is denoted by a "!=". For example, if we wanted to extract observations from `pt_copy` where the "continent" variable is NOT equal to "africa", and assign the result to a new object named `pt_copy_sans_africa`, we can write the following:
+
+```{r}
+# Extracts all non-Africa observations and assigns to object named "pt_copy_sans_africa"
+pt_copy_sans_africa<-pt_copy %>% filter(continent!="africa") %>% relocate(continent)
+```
+
+```{r}
+#| eval: false
+# views pt_copy_sans_africa in the data viewer
+View(pt_copy_sans_africa)
+```
+
+```{r}
+#| echo: false
+pt_copy_sans_africa %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+# Elementary Data Analysis
+
+In this section, we'll review some functions that can implement some basic data analysis tasks. Our focus is not on the methodologies themselves, but how to implement them.
+
+## Computing Correlations
+
+### Computing a correlation coefficient
+
+We can compute a basic correlation coefficient using the `core.test()` function:
+
+```{r}
+# computes correlation coefficient between "trade" and "cgexp" variables and assigns the result to a new object named "trade_cgexp_cc"
+trade_cgexp_cc<-cor.test(pt_copy$trade, pt_copy$cgexp)
+```
+
+```{r}
+# prints results of "trade_cgexp_cc"
+trade_cgexp_cc
+```
+
+We can format this more cleanly using the `tidy()` function from the *broom* package (part of the *tidyverse*:
+
+```{r}
+# cleans up formatting of "trade_cgexp_cc"
+broom::tidy(trade_cgexp_cc)
+```
+
+We can assign this neater version of the model output to a new object named `trade_cgexp_cc_clean`:
+
+```{r}
+# assigns well-formatted model output to "trade_cgexp_cc_clean"
+trade_cgexp_cc_clean<-broom::tidy(trade_cgexp_cc)
+```
+
+### Generating a correlation matrix
+
+To generate a correlation matrix, we can use the `cor()` function. First, we'll select the variables we want to examine:
+
+```{r}
+# generating a correlation matrix
+# Extracts variables for which we want a correlation matrix
+desired_variables<-pt_copy %>% select(trade, cgexp, cgrev, catho80)
+```
+
+Now, we can pass `desired_variables` as an argument to the `cor()` function, and assign it to a new object named `cor_matrix`:
+
+```{r}
+# Creates correlation matrix from "desired_variables" object and assigns to object named "cor_matrix"
+cor_matrix<-cor(desired_variables, use="complete.obs")
+```
+
+```{r}
+# prints contents of "cor_matrix"
+cor_matrix
+```
+
+## Basic Regression Models
+
+### Bivariate Regression
+
+We can run a linear regression model in R using the `lm()` function, where the first argument is the dependent variable, and the independent variables appear after the `~` that follows the dependent variable. We must also specify what data is being modeled using the `data` argument. Below, we'll calculate a simple bivariate regression using `pt_copy`, where the independent variable is "cgexp" (central goverment expenditure), and the independent variable is "trade" (as a share of GDP). We'll assign the output of the model to a new object named `regression1:`
+
+```{r}
+# implements bivariate regression with "gexp" as DV and "trade" as IV; assigned to "regression1" object
+regression1<-lm(cgexp~trade, data=pt_copy)
+```
+
+We can view the regression output by passing the object to the `summary` function:
+
+```{r}
+# prints output of "regression1"
+summary(regression1)
+```
+
+### Multivariate Regression
+
+The process for multivariate regression is much the same as for bivariate regression; we simply add the additional independent variables after with a "+" sign. Below, we compute a regression with additional covariates and assign it to the object named `regression2`:
+
+```{r}
+# Implements regression with "gexp" as DV, and assigns to object named "regression1"
+regression2<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd, data=pt_copy)
+```
+
+Now, we can print out model output using the `summary` function:
+
+```{r}
+# prints output of "regression2"
+summary(regression2)
+```
+
+### Categorical Variables in a Regression Model
+
+#### Factor Variables
+
+```{r}
+# prints class of "continent" variable
+class(pt_copy$continent)
+```
+
+```{r}
+# Set "continent" variable as factor
+pt_copy$continent<-as.factor(pt_copy$continent)
+```
+
+```{r}
+# check levels of "continent" factor variable
+levels(pt_copy$continent)
+```
+
+```{r}
+# Relevels factor variable to set "other" as reference category
+pt_copy$continent<-relevel(pt_copy$continent, ref="other")
+```
+
+```{r}
+# Run regression with the continent variable and assign result to object named "regression2"
+regression3<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+continent+col_espa+col_uka+col_otha+oecd, data=pt_copy)
+
+```
+
+```{r}
+# Prints regression table for "regression3"
+summary(regression3)
+```
+
+#### Dummy Variables
+
+Alternatively, we can use dummy variables.
+
+```{r}
+# Use "continent" field to make continent dummy variables
+pt_copy<-pt_copy %>% dummy_cols("continent")
+```
+
+```{r}
+# includes dummy variables in regression with "other" as the excluded category
+regression3_alt<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+continent_africa+
+                      continent_asiae+continent_laam+col_espa+col_uka+col_otha+oecd,
+                      data=pt_copy)
+```
+
+```{r}
+# prints results of "regression3_alt"; note that that it's equivalent to the results of "regression3" because using factor variables and dummies are different ways of doing the same thing
+summary(regression3_alt)
+```
+
+### Interaction Terms
+
+```{r}
+# run regression with interaction term between "trade" and "federal"
+trade_federal_interaction<-lm(cgexp~trade*federal, data=pt_copy)
+```
+
+```{r}
+# prints "trade_federal_interaction" regression table
+summary(trade_federal_interaction)
+```
+
+```{r}
+# Finds mean value of trade variable
+mean(pt_copy$trade)
+```
+
+```{r}
+# Calculates marginal effects of federalism, with "trade" held at mean
+marginal_effect_federalism<-ggpredict(trade_federal_interaction, terms="federal", condition=c(trade=78.7659))
+```
+
+```{r}
+# Prints marginal effects table
+marginal_effect_federalism
+```
+
+# Working With Multiple Datasets
+
+## Data Transfer Part 2: Reading in Multiple Datasets
+
+```{r}
+# prints the names of the files we want to read in and assigns the vector of strings to a new object named "worldbank_filenames" 
+worldbank_filenames<-list.files("data/wb")
+```
+
+```{r}
+# reads world bank files into a list that is assigned to an object named "world_bank_list"
+setwd("data/wb")
+world_bank_list<-map(worldbank_filenames, read_csv)
+```
+
+```{r}
+# prints contents of "world_bank_list"
+world_bank_list
+```
+
+```{r}
+# removes CSV extension from "worldbank_filenames"
+worldbank_filenames_base<-str_remove(worldbank_filenames, ".csv")
+```
+
+```{r}
+# assigns names to datasets in "world_bank_list"
+names(world_bank_list)<-worldbank_filenames_base
+```
+
+```{r}
+#| eval: false
+# extracts fdi dataset from "world_bank_list" by assigned name
+world_bank_list[["wdi_fdi2019"]]
+```
+
+```{r}
+#| echo: false
+head(world_bank_list[["wdi_fdi2019"]])
+```
+
+## Joining Data
+
+```{r}
+# extracts fdi dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_fdi"
+wdi_fdi<-world_bank_list[["wdi_fdi2019"]]
+```
+
+```{r}
+# extracts debt dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_debt"
+wdi_debt<-world_bank_list[["wdi_debt2019"]]
+```
+
+```{r}
+# drop na's in debt and FDI datasets and rename variables
+wdi_debt<-wdi_debt %>%
+            drop_na() %>% 
+            rename(debt_2019=`2019 [YR2019]`)
+
+wdi_fdi<-wdi_fdi %>% 
+            drop_na() %>% 
+            rename(fdi_2019=`2019 [YR2019]`)
+```
+
+```{r}
+# join together "wdi_fdi" and "wdi_fdi" using country code
+debt_fdi_join<-full_join(wdi_fdi, wdi_debt, by="Country Code")
+```
+
+## Appending Data
+
+```{r}
+# extracts worldbank FDI data from "world_bank_list" and assigns it to the object "worldbank_fdi_2019"
+worldbank_fdi_2019<-world_bank_list[["wdi_fdi2019"]]
+
+# extracts worldbank trade data from "world_bank_list" and assigns it to the object "worldbank_trade_2019"
+worldbank_trade_2019<-world_bank_list[["wdi_trade2019"]]
+```
+
+```{r}
+# Appends "worldbank_trade_2019" to "worldbank_fdi_2019" and assigns new dataset to object named "worldbank_trade_fdi"
+worldbank_trade_fdi<-bind_rows(worldbank_fdi_2019, worldbank_trade_2019)
+```
+
+## Reshaping Data
+
+### Long to Wide
+
+```{r}
+# cleans the dataset before reshaping
+worldbank_trade_fdi_cleaned<-worldbank_trade_fdi %>% 
+                              rename(economic_variables="2019 [YR2019]",
+                                     series_code="Series Code") %>% 
+                              select(-"Series Name") %>% 
+                              drop_na()
+                      
+                                      
+```
+
+```{r}
+# converts "economic_variables" to numeric
+worldbank_trade_fdi_cleaned$economic_variables<-as.numeric(worldbank_trade_fdi_cleaned$economic_variables)
+```
+
+```{r}
+# reshapes "worldbank_trade_fdi_cleaned" from long to wide and assigns the wide dataset to an object named "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_cleaned %>% 
+                              tidyr:: pivot_wider(names_from=series_code,
+                                          values_from=economic_variables)
+```
+
+```{r}
+# renames columns in "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_wide %>% 
+                          rename(trade=NE.TRD.GNFS.ZS,
+                                 FDI=BX.KLT.DINV.WD.GD.ZS)
+```
+
+```{r}
+#| eval: false
+# Views "worldbank_trade_fdi_wide" in the Viewer
+View(worldbank_trade_fdi_wide)
+```
+
+```{r}
+#| echo: false
+worldbank_trade_fdi_wide %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Wide to Long
+
+```{r}
+# reshapes "worldbank_trade_fdi_wide" back to long format and assigns the reshaped dataset to a new object named "world_bank_trade_long"
+world_bank_trade_long<-worldbank_trade_fdi_wide %>% 
+                        pivot_longer(cols=c(FDI, trade),
+                                     names_to="economic_variable",
+                                     values_to = "2019")
+                        
+```
+
+## Automating Data Processing with Functions
+
+```{r}
+# write function to clean World Bank dataset
+worldbank_cleaning_function<-function(input_dataset){
+  modified_dataset<-input_dataset %>% 
+                      select(-"Series Code") %>% 
+                      rename("Country"="Country Name",
+                             "CountryCode"="Country Code",
+                             "Series"="Series Name",
+                             "2019"="2019 [YR2019]") %>% 
+                      drop_na(CountryCode)
+  return(modified_dataset)
+}
+```
+
+```{r}
+# Iteratively apply "worldbank_cleaning_function" to all of the datasets in "world_bank_list", and deposit the cleaned datasets into a new list named "world_bank_list_cleaned"
+world_bank_list_cleaned<-map(world_bank_list, worldbank_cleaning_function)
+```
+
+# Data Transfer Part 2: Exporting Data
+
+## Exporting a Data Frame
+
+```{r}
+# exports "worldbank_trade_fdi_wide" to a local directory
+write_csv(worldbank_trade_fdi, "outputs/worldbank_trade_fdi.csv")
+```
+
+## Exporting a Summary Statistics Table
+
+```{r}
+# writes summary statistics table "pt_copy_summarystats1_df"  as CSV
+write.csv(pt_copy_summarystats1, "outputs/summary_statistics.csv", row.names = TRUE)
+```
+
+```{r}
+# exports a text summary stats table with stargazer
+stargazer(as.data.frame(pt_copy), type="text", title="Descriptive Statistics", digits=1, out="outputs/summary_stats.txt")
+
+```
+
+```{r}
+# exports an html summary stats table with stargazer
+stargazer(as.data.frame(pt_copy), type = "text", title = "Descriptive Statistics", digits = 1, out = "outputs/summary_stats.html")
+
+```
+
+## Exporting Regression Tables
+
+```{r}
+#| results: hide
+# makes list container for regressions we want to export
+regression_list<-list(regression1, regression2, regression3)
+```
+
+```{r}
+#| results: hide
+# exports regressions in "regression_list" via stargazer as html
+stargazer(regression_list, type="html", out="outputs/cgexp_regressions.html")
+```
+
+```{r}
+#| results: hide
+
+# exports regressions in "regression_list" via stargazer as text file
+stargazer(regression_list, type="text", out="outputs/cgexp_regressions.txt")
+```
+
+## Iteratively Exporting Multiple Data Frames
+
+```{r}
+# create file names for exported World Bank files
+WB_filenames_export<-paste0("outputs/", worldbank_filenames_base, "_cleaned.csv")
+```
+
+```{r}
+# exports datasets in "world_bank_list_cleaned" to "outputs" directory using filenames in "WB_filenames_export"
+walk2(world_bank_list_cleaned, WB_filenames_export, write_csv)
+```
+
+# Exercises
+
+*Exercise 1*
+
+Write a function that takes a dataset as an input argument, and returns a table of summary statistics that includes a column containing information on the number of missing values/NA values associated with each variable
+
+*Exercise 2*
+
+Earlier, we used the following to drop rows in the `student_scores` dataset that have NA values associated with the "Age" variable. Rewrite that code using the `%>%` operator.
+
+*Exercise* 3
+
+Apply the `filter()` AND the `select()` function to one of the datasets we've worked with in this lesson (chaining together operations with the `%>%` operator, and assign the modified dataset to a new object that you write out to a local directory on your computer as a CSV file.

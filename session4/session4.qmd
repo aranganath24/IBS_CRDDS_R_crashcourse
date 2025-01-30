@@ -1,0 +1,751 @@
+---
+title: "Analyzing, Integrating, and Visualizing Data in R"
+author: "Aditya Ranganath"
+format: 
+  html:
+    toc: true 
+    toc-depth: 2
+    toc-expand: 2
+    number-sections: true
+    number-depth: 3
+editor: visual
+---
+
+# Introduction
+
+In the past two sessions, we presented some ideas, concepts, and tools that provide a basic foundation for working with data in R. Now that we have this basic foundation, we'll turn in this session to a more applied exploration of some actual datasets. Our goal here is to introduce you to some useful functions that will allow you to explore and begin making sense of actual datasets in R. This lesson will provide a tour of various functions that can be particularly helpful as you get started cleaning, wrangling, and analyzing your data in R. Among the topics we'll cover today are:
+
+-   Loading data into R
+
+-   Handling missing data
+
+-   Summary Statistics in R
+
+-   Data cleaning and processing
+
+-   Basic analysis (correlations and regressions)
+
+-   Joining Data
+
+-   Reshaping Data
+
+-   Exporting data out of R
+
+We will be working with a handful of datasets, which you will need to [download](https://www.dropbox.com/scl/fo/2aianyhhdx92auh9aa6l2/AP1MzlzGD3KL2YBI-o9I4v4?rlkey=tm7z8sr0sxpjm5uquu154ni99&st=2a34xm00&dl=0). We will primarily be working with a crossnational dataset collected and made public by the economists Torsten Persson and Guido Tabellini; it's one of the datasets they work with in their highly influential book, entitled "The Economic Effects of Constitutions." The codebook for the dataset is provided along with the data in the downloaded materials. We'll also be working with some datasets collected from the World Bank's [World Development Indicators](https://databank.worldbank.org/source/world-development-indicators).Installing Packages and Loading Libraries
+
+Please go ahead and install any of the packages below that you have not already installed.
+
+```{r chunk1}
+#| eval: FALSE
+
+# Install packages using the "install.packages" function
+install.packages("tidyverse")
+install.packages("psych")
+install.packages("janitor")
+install.packages("fastDummies")
+install.packages("stargazer")
+install.packages("gtsummary")
+install.packages("ggeffects")
+```
+
+Note that when you need to install a lot of packages at once, you can put the names of the packages you'd like to install into a character vector and pass it to the `install.packages()` function:
+
+```{r chunk2}
+#| eval: FALSE
+
+# Installing multiple packages by passing package names as strings to the "install.packages" function
+install.packages(c("tidyverse", "psych", "janitor", "fastDummies"))
+```
+
+Remember to load the required libraries (even packages you've already installed before).
+
+```{r test3}
+#| warning: FALSE
+#| message: FALSE
+# load libraries
+library(tidyverse)
+library(psych)
+library(janitor)
+library(fastDummies)
+library(janitor)
+library(summarytools)
+library(stargazer)
+library(gtsummary)
+library(ggeffects)
+```
+
+```{r}
+#| echo: false
+library(DT)
+```
+
+# Preliminaries
+
+Please go ahead and set your working directory, read in the Persson-Tabellini dataset and assign it to an object named `pt`, and then make a copy that you can use in this session:
+
+```{r}
+# reads in PT data into R
+pt<-read_csv("data/pt/persson_tabellini_workshop.csv")
+
+# makes dataset copy
+pt_copy<-pt
+```
+
+# Elementary Data Analysis
+
+In this section, we'll review some functions that can implement some basic data analysis tasks. Our focus is not on the methodologies themselves, or deeper questions about drawing inferences from data and the appropriateness of various models in different contexts. Our goal is simply to provide you with a tour of how to implement some standard statistical procedures in R; if you continue to use R, you will quickly come to appreciate the enormous resources if offers for statistical work. Here, we only have time to barely scratch the surface.
+
+## Computing Correlations
+
+### Computing a correlation coefficient
+
+We can compute a basic correlation coefficient using the `core.test()` function:
+
+```{r}
+# computes correlation coefficient between "trade" and "cgexp" variables and assigns the result to a new object named "trade_cgexp_cc"
+trade_cgexp_cc<-cor.test(pt_copy$trade, pt_copy$cgexp)
+```
+
+```{r}
+# prints results of "trade_cgexp_cc"
+trade_cgexp_cc
+```
+
+We can format this more cleanly using the `tidy()` function from the *broom* package (part of the *tidyverse*:
+
+```{r}
+# cleans up formatting of "trade_cgexp_cc"
+broom::tidy(trade_cgexp_cc)
+```
+
+We can assign this neater version of the model output to a new object named `trade_cgexp_cc_clean`:
+
+```{r}
+# assigns well-formatted model output to "trade_cgexp_cc_clean"
+trade_cgexp_cc_clean<-broom::tidy(trade_cgexp_cc)
+```
+
+### Generating a correlation matrix
+
+To generate a correlation matrix, we can use the `cor()` function. First, we'll select the variables we want to examine:
+
+```{r}
+# generating a correlation matrix
+# Extracts variables for which we want a correlation matrix
+desired_variables<-pt_copy %>% select(trade, cgexp, cgrev, catho80)
+```
+
+Now, we can pass `desired_variables` as an argument to the `cor()` function, and assign it to a new object named `cor_matrix`:
+
+```{r}
+# Creates correlation matrix from "desired_variables" object and assigns to object named "cor_matrix"
+cor_matrix<-cor(desired_variables, use="complete.obs")
+```
+
+```{r}
+# prints contents of "cor_matrix"
+cor_matrix
+```
+
+## Basic Regression Models
+
+### Bivariate Regression
+
+We can run a linear regression model in R using the `lm()` function, where the first argument is the dependent variable, and the independent variables appear after the `~` that follows the dependent variable. We must also specify what data is being modeled using the `data` argument. Below, we'll calculate a simple bivariate regression using `pt_copy`, where the independent variable is "cgexp" (central goverment expenditure), and the independent variable is "trade" (as a share of GDP). We'll assign the output of the model to a new object named `regression1:`
+
+```{r}
+# implements bivariate regression with "gexp" as DV and "trade" as IV; assigned to "regression1" object
+regression1<-lm(cgexp~trade, data=pt_copy)
+```
+
+We can view the regression output by passing the object to the `summary` function:
+
+```{r}
+# prints output of "regression1"
+summary(regression1)
+```
+
+### Multivariate Regression
+
+The process for multivariate regression is much the same as for bivariate regression; we simply add the additional independent variables after with a "+" sign. Below, we compute a regression with additional covariates and assign it to the object named `regression2`:
+
+```{r}
+# Implements regression with "gexp" as DV, and assigns to object named "regression1"
+regression2<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd, data=pt_copy)
+```
+
+Now, we can print out model output using the `summary` function:
+
+```{r}
+# prints output of "regression2"
+summary(regression2)
+```
+
+### Categorical Variables in a Regression Model
+
+If you want to add categorical variables to a regression model, you can directly include variables that are of the class "character" without running into any issues. Under the hood, R will convert those character variables into dichotomous variables, and calculate the regression coefficients and standard errors accordingly. To see this, let's try adding the "continent" variable to `regression2 above.` First, we'll confirm that the "continent" variable is of the character class:
+
+```{r}
+# prints class of "continent" variable
+class(pt_copy$continent)
+```
+
+Now, we'll put it into the regression model from `regression2`, and assign the output to a new object named `regression3`:
+
+```{r}
+# adds "continent" categorical variable to previously run "regression2" model; output of model assigned to object named "regression3"
+regression3<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd+continent, data=pt_copy)
+```
+
+Let's now look at the model output:
+
+```{r}
+# opens model output of "regression3"
+summary(regression3)
+```
+
+Note that "africa" is the excluded category that serves as the reference against which the effects of the other categories are interpreted. If we are okay with accepting the default excluded category (which is the first category by alphabetical order, hence "africa" as the excluded category) running the regression with a character variable is perfectly fine. However, if we want to change the reference category, we'll have to either use a factor variable or create and include dummy variables in our regression. In R, a factor is a data type that's specifically designed for categorical variables; factors consider each separate category within a categorical variable as a distinct "level", which allows them to be treated as dummy variables in regression models. Indeed, when we include a categorical variable of the "character" class, R converts that variable into a factor under the hood before including it in the regression, with the "levels" being treated as dummy variables, and the excluded level being the category that is first with respect to alphabetical order. If we want to change the excluded level, we have to get under the hood and "relevel" the factor, so that the desired excluded category is first in the factor order. To do so, we'll first change the continent variable from a "character" variable to a "factor" variable:
+
+```{r}
+# Set "continent" variable as factor
+pt_copy$continent<-as.factor(pt_copy$continent)
+```
+
+Now, let's check the levels of the "continent" variable using the `levels()` function:
+
+```{r}
+# check levels of "continent" factor variable
+levels(pt_copy$continent)
+```
+
+As expected, the first level of the "continent" factor is "africa", which means that it's the excluded category in a regression model by default. To change this, and make "other" the first level (and hence the excluded category), we can use the `relevel()` function and explicitly set "other" as the reference category:
+
+```{r}
+# Relevels "continent" factor variable to set "other" as reference category
+pt_copy$continent<-relevel(pt_copy$continent, ref="other")
+```
+
+Let's now check the levels of the "continent" variable:
+
+```{r}
+# check levels of "continent" factor variable
+levels(pt_copy$continent)
+```
+
+This confirms that the variable has been releveled, and "other" is now the reference category. Let's go ahead and run the regression with "continent" as a releveled factor variable with "other" as the excluded category:
+
+```{r}
+# runs regression model with releveled continent variable, "other" is excluded category
+regression4<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd+continent, data=pt_copy)
+```
+
+```{r}
+# prints model output of "regression4
+summary(regression4)
+```
+
+Note that "other" is now the excluded category in the model.
+
+If we want full control over the excluded/reference category when including categorical variables, another option is to simply create dichotomous/dummy variables based on the categorical variable, and explicitly decide which dichotomous variable to exclude as the reference category. To make these dummy variables, we can (as we have learned), use the `dummy_cols()` function from the *fastDummies* package. In this case, we'll make dummy variables based on the "continent" variable:
+
+```{r}
+# Use "continent" field to make continent dummy variables
+pt_copy<-pt_copy %>% dummy_cols("continent")
+```
+
+Now, we'll include all of the dummy variables except "other" (the reference category) and run the regression:
+
+```{r}
+# includes dummy variables in regression with "other" as the excluded category; model output assigned to object named "regression5"
+regression5<-lm(lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd+continent_africa+continent_asiae+continent_laam, data=pt_copy))
+```
+
+Now, let's go ahead and print the model output:
+
+```{r}
+# prints model output for "regression4"
+summary(regression5)
+```
+
+Note that the model outputs are the same as for regression4, which is what we'd expect, since factor variables are dummy variables under the hood.
+
+### Interaction Terms
+
+It is often useful to include interaction terms in our regression models. Interaction terms allow us to explore situation where the effect of one variable in the regression depends on another variable in the model (and vice-versa). In R, interaction terms can be defined with "\*" between the two components of the interaction. When an interaction term is included in a regression model, there's no need to to explicitly also include the individual components in the model; when an interaction is added, the individual components will also be incorporated into the model. Let's explore a simple regression model with an interaction term between "trade" and "federal"; the independent variable remains "cgexp". Below, we'll run the model, and assign the output to an object named `trade_federal_interaction`:
+
+```{r}
+# run regression with interaction term between "trade" and "federal"
+trade_federal_interaction<-lm(cgexp~trade*federal, data=pt_copy)
+```
+
+Let's check the model output:
+
+```{r}
+# prints "trade_federal_interaction" regression table
+summary(trade_federal_interaction)
+```
+
+Interpreting regression tables when there's an interaction is of course tricky, since the coefficients on the individual variables that are part of the interaction term can no longer be interpreted in isolation. They can only be interpreted in conjunction with the other component of the interaction. Let's say, for example, that we're interested in the impact of federalism on central government expenditure ("cgexp"). Given the interaction term, we cannot simply infer that the central government expenditure as a share of GDP is 4.69 points lower for federal countries, on average, than non-federal countries. The coefficient on "federal" tells us that central government expenditure as a share of GDP is on average 4.69 points lower for federal countries when trade as a share of GDP is 0, but this information is of debatable value (since trade is unlikely to be in that range for any realistic scenario).
+
+Rather than try to interpret the effect of federalism in the presence of an interaction term that makes this interpretation with simply a regression table rather complicated, it makes sense to compute the marginal effects for federalism on "cgexp" while holding the value of trade at its mean. First, we'll calculate the mean of the "trade" variable:
+
+```{r}
+# Finds mean value of trade variable
+mean(pt_copy$trade)
+```
+
+Then, we'll incorporate this value into the `ggpredict()` function, which is used to comput marginal effects in regressions that incorporate interaction terms. The first argument to `ggpredict()` is the regression output (`trade_federal_interaction`) so that `ggpredict()` knows the model we're estimating. The argument `terms=federal` indicates that we are interested in the marginal effects of the federalism variable (rather than the trade) variable; finally, `condition=c(trade=78.7659` indicates that we want to compute the marginal effect of federalism on "cgexp" when the trade variable is held at its men. We'll assign the resulting marginal effects table to an object named `marginal_effect_federalism`:
+
+```{r}
+# Calculates marginal effects of federalism, with "trade" held at mean
+marginal_effect_federalism<-ggpredict(trade_federal_interaction, terms="federal", condition=c(trade=78.7659))
+```
+
+Now, let's go ahead and print the contents of `marginal_effect_federalism`:
+
+```{r}
+# Prints marginal effects table
+marginal_effect_federalism
+```
+
+This table indicates the predicted value for the "cgexp" variable for non-federal (`federal=0`) countries is 29.43, while the predicted value for federal (`federal=1`) countries is 25.52. So on average, the GDP share of central government expenditure is about 3.91 points higher for non-federal countries. The table also provides confidence intervals for these predicted values, and just by eyeballing them, it looks like there's quite a bit of overlap in them, indicating that the difference is probably not statistically significant. Below, we'll learn how to graph this table; a visual representation of the marginal effects can allow us to quickly make sense of the relationships in the data when there are interaction effects present.
+
+# Visualization with *ggplot2* 
+
+In this section, we'll discuss how to use *ggplot2* to visualize our data. *ggplot2* is the *tidyverse*'s visualization package, and is rooted in a framework known as the "grammar of graphics" (in fact, the "gg" in *ggplot2* stands for "grammar of graphics"). The basic idea behind the grammar of graphics is that we create visualizations by layering different elements on top of each other. For example, the foundational layer is the data used to create the plot. Another element layered on top of the data is a visualization's aesthetic (often referred to as "aes"), which specifies how the underlying data is mapped onto the visual properties of the visualization. For example, features like color, size, and shape can be used to distinguish different groups or points in the data, and are considered part of the aesthetic layer. On top of the data and aesthetics, we can layer geometries, which specify how the data is represented in terms of visual geometries (i.e. points, lines, bars etc.). Other elements include themes, which refer to properties of the plot that are not directly tied to the plot (such as background color, text positioning, and font sizes), but which can meaningfully shape the visualization's appearance and a viewer's ability to engage with it. The syntax of *ggplot2* corresponds to the concept of the grammar of graphics; different functions correspond to different "layers" in the grammar of graphics, and are layered on top of each other with a "+" sign, building out the visualization element by element.
+
+*ggplot2* is a remarkable package, and builds on R's prior strengths as a data visualization platform. It's possible to make beautiful visualizations using *ggplot2*, but our focus here will be on getting acquainted with the basic syntax of the package, and making some quick exploratory visualizations based on data from the `pt_copy` dataset.
+
+## Bar Charts
+
+Let's start by making some simple bar charts for the African countries in `pt_copy`. Let’s say we want to make a bar chart that displays variation in the “cgexp” variable (central government expenditure as a share of GDP) for African countries. We’ll begin by extracting the Africa observations from `pt_copy` using the `filter()` function, and removing any “NA” observations for this variable from the dataset using the `drop_na()` function:
+
+```{r}
+# filters Africa observations
+pt_africa<-pt_copy %>% 
+            filter(continent=="africa") %>% 
+            drop_na(cgexp)
+```
+
+Now, let's make a basic bar chart of the "cgexp" data from `pt_africa`, and assign it to an object named `cgexp_africa`:
+
+```{r}
+# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations and assigns the plot to an object named "cgexp_africa"
+cgexp_africa<-
+  ggplot(pt_africa)+
+  geom_col(aes(x=country, y=cgexp))+
+  labs(
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    x="Country Name", 
+    y="CGEXP")+
+  theme(plot.title=element_text(hjust=0.5),
+        axis.text.x = element_text(angle = 90))
+```
+
+Let's unpack the code above:
+
+-   The expression `ggplot(pt_africa)` specifies that we want to initialize *ggplot*, and declares the dataset containing the data we want to map ("pt_africa")
+-   `geom_col()` indicates that we want to make a bar chart. If you wanted to make a different type of chart, this function would be different. Within the `geom_col()` function, we indicate our desired aesthetic mapping `aes()`; an aesthetic mapping indicates how we would like variables in the datasets to be represented on the chosen visualization. Here, the expression `x=country, y=cgexp` simply indicates that we want countries to be represented on the x-axis of the chart, and the "cgexp" variable to be represented on the y-axis.
+-   The arguments to the `labs()` function (short for "labels") specify a desired title for the visualization, and x-axis and y-axis labels.
+-   The arguments to the `theme()` function specify a desired position for the plot title, and a desired format for the x-axis labels.
+
+Let's see what `cgexp_africa` looks like:
+
+```{r}
+# prints contents of cgexp_africa
+cgexp_africa
+```
+
+This is a nice start, but it may look a bit cleaner if we arrayed the chart in ascending order with respect to the cgexp variable. To do so, we can slightly change our aesthetic mapping to look like this: `aes(x=reorder(country, cgexp), y=cgexp))`. This indicates that we'd still like the "cgexp" variable on the y-axis, and countries on the x-axis; however, we'd also like to order countries in ascending order with respect to the "cgexp" variable. We'll also lower the X-axis label a bit, to make it less crowded; we can do so with `axis.title.x=element_text(margin=margin(t=20)`. We'll assign this modified chart to a new object named `cgexp_africa_ascending`:
+
+```{r}
+# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations; countries are on the x axis and arrayed in ascending order with respect to the cgexp variable, which is on the y-axis; plot is assigned to an object named "cgexp_africa_ascending"
+cgexp_africa_ascending<-
+  ggplot(pt_africa)+
+  geom_col(aes(x=reorder(country, cgexp), y=cgexp))+
+  labs(
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    x="Country Name", 
+    y="CGEXP")+
+  theme(plot.title=element_text(hjust=0.5),
+        axis.text.x = element_text(angle = 90),
+        axis.title.x=element_text(margin=margin(t=20)))
+```
+
+All other apsects of the code are the same as before. Let's see what the modified chart looks like:
+
+```{r}
+# prints "cgexp_africa_ascending"
+cgexp_africa_ascending
+```
+
+If, instead of arranging the countries in ascending order with respect to the "cgexp" variable, we want to arrange them in descending order, we can simply put a "-" before "cgexp" within the aesthetic mapping; we'll assign the modified chart to a new object named `cgexp_africa_descending`:
+
+```{r}
+# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations; countries are on the x axis and arrayed in descending order with respect to the cgexp variable, which is on the y-axis; plot is assigned to an object named "cgexp_africa_descending"
+cgexp_africa_descending<-
+  ggplot(pt_africa)+
+  geom_col(aes(x=reorder(country, -cgexp), y=cgexp))+
+  labs(
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    x="Country Name", 
+    y="CGEXP")+
+  theme(plot.title=element_text(hjust=0.5),
+        axis.text.x = element_text(angle = 90),
+        axis.title.x=element_text(margin=margin(t=20)))
+```
+
+Let's see how the `cgexp_africa_descending` plot now looks:
+
+```{r}
+# prints contents of "cgexp_africa_descending"
+cgexp_africa_descending
+```
+
+Sometimes, you may wish to invert the axes of your charts, which you can do using the `coord_flip()` function. The code below takes the `cgexp_africa_ascending` chart we created above, inverts the axes using `coord_flip()`, and assigns the result to a new object named `cgexp_africa_ascending_inverted`:
+
+```{r}
+# creates a sideways bar chart using the "coord_flip" function and assigns it to a new object named "cgexp_africa_ascending_inverted"  
+cgexp_africa_ascending_inverted<-cgexp_africa_ascending+
+                                    coord_flip()
+```
+
+```{r}
+# prints "cgexp_africa_ascending_inverted"
+cgexp_africa_ascending_inverted
+```
+
+When we use `coord_flip()` in *ggplot2* it flips the axes (i.e. the x-axis becomes the y-axis and vice versa). As a result, the (now) x-axis labels in `cgexp_africa_ascending_inverted` are difficult to read, and need to be adjusted. We can do so by modifying the "axis.text.x" argument within the `theme()` function:
+
+```{r}
+# fixes x axis labels
+cgexp_africa_ascending_inverted<-cgexp_africa_ascending_inverted+
+                                    theme(axis.text.x = element_text(angle = 0))
+                                    
+```
+
+Let's see what the plot looks like now:
+
+```{r}
+# prints contents of "cgexp_africa_ascending_inverted"
+cgexp_africa_ascending_inverted
+```
+
+## Scatterplots
+
+The syntax to make a scatterplot is fairly similar to the syntax used to create a bar chart; the main difference is that instead of using the `geom_col()` function to indicate that we want a bar chart, we use the `geom_point()` function to indicate that we want a scatterplot. We will be creating scatterplots of the "cgexp" and "trade" variables, so we'll start by cleaning `pt_copy` to prepare it for visualization. In particular, we'll remove NA values for these two variables, and assign this version of the dataset to an object named `pt_copy_cleaned`:
+
+```{r}
+# removes rows with NA values for "cgexp" and "trade; assigns cleaned dataset to object named "pt_copy_cleaned"
+pt_copy_cleaned<-pt_copy %>% drop_na(cgexp, trade)
+
+```
+
+Now, we're ready to make our scatterplot. The code below generates a scatterplot of the "cgexp" variable (on the x axis) and the "trade" variable (on the y-axis) for all observations in the `pt_copy` dataset, and assigns it to a new object named `scatter_cgexp_trade`:
+
+```{r}
+# Creates scatterplot with "cgexp" variable on x-axis and "trade" variiable on y-axis and assigns to object named "scatter_cgexp_trade"
+scatter_cgexp_trade<-
+  ggplot(pt_copy_cleaned)+
+  geom_point(aes(x=cgexp, y=trade))+
+  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
+       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
+  theme(plot.title=element_text(hjust=0.5)) 
+```
+
+Let's see what `scatter_cgexp_trade` looks like:
+
+```{r}
+# prints contents of "scatter_cgexp_trade"
+scatter_cgexp_trade
+```
+
+Sometimes, we may wish to distinguish between different groups in a scatterplot. One way to do that is to assign different colors to different groups of interest. For example, if we wanted to distinguish continents in the scatterplot, we could specify `color=continent` in the aesthetic mapping. The code below does so, and assigns the result to a new object named `scatter_cgexp_trade_grouped`:
+
+```{r}
+# Creates scatterplot with "cgexp" variable on x-axis and "trade" variable on y-axis, and uses different color points for different continents; plot is assigned to object named "scatter_cgexp_trade_grouped"
+scatter_cgexp_trade_grouped<-
+  ggplot(pt_copy_cleaned)+
+  geom_point(aes(x=cgexp, y=trade, color=continent))+
+  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
+       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
+  theme(plot.title=element_text(hjust=0.5)) 
+```
+
+Let's see what `scatter_cgexp_trade_grouped` looks like:
+
+```{r}
+# prints contents of "scatter_cgexp_trade_grouped"
+scatter_cgexp_trade_grouped
+```
+
+An alternative way of parsing categories is to use facets, which create separate visualizations for each of the different categories in a dataset. Below, for example, we create separate scatterplots for each continent (this is specified by the final line in the code, `facet_wrap(~continent, nrow=2))`:
+
+```{r}
+# Creates continent-level subplots for scatterplot, using facets; assigns plot to new object named "scatter_cgexp_trade_facets"
+scatter_cgexp_trade_facets<-
+  ggplot(pt_copy_cleaned) + 
+  geom_point(aes(x = cgexp, y = trade)) + 
+  facet_wrap(~ continent, nrow = 2)
+```
+
+Let's print the contents of `scatter_cgexp_trade_facets`:
+
+```{r}
+# prints "scatter_cgexp_trade_facets"
+scatter_cgexp_trade_facets
+```
+
+Finally, it's important to note that it's possible to layer different geometries over each other. For example, the code below plots a scatterplot for the `pt_copy` dataset with the "cgexp" variable on the x axis and the trade variable on the y-axis, but also plots a line of best fit on top of the scatterplot with `geom_smooth(aes(x=cgexp, y=trade), method="lm")`; we'll assign the resulting plot to `scatter_cgexp_trade_line`:
+
+```{r}
+# Creates scatterplot with "cgexp" variable on x-axis and "trade" variiable on y-axis, adds line of best fit; plot assigned to object named "scatter_cgexp_trade_line"
+scatter_cgexp_trade_line<-
+  ggplot(pt_copy_cleaned)+
+  geom_point(aes(x=cgexp, y=trade))+
+  geom_smooth(aes(x=cgexp, y=trade), method="lm")+
+  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
+       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
+  theme(plot.title=element_text(hjust=0.5)) 
+```
+
+Let's see what it looks like:
+
+```{r}
+# Prints contents of "scatter_cgexp_trade_line"
+scatter_cgexp_trade_line
+```
+
+Finally, before proceeding, let's quickly return to our marginal effects plot from the previous section, and use `ggplot2()` to plot the marginal effects for federalism from that regression model. Recall the output
+
+# Working With Multiple Datasets
+
+## Data Transfer Part 2: Reading in Multiple Datasets
+
+```{r}
+# prints the names of the files we want to read in and assigns the vector of strings to a new object named "worldbank_filenames" 
+worldbank_filenames<-list.files("data/wb")
+```
+
+```{r}
+# reads world bank files into a list that is assigned to an object named "world_bank_list"
+setwd("data/wb")
+world_bank_list<-map(worldbank_filenames, read_csv)
+```
+
+```{r}
+# prints contents of "world_bank_list"
+world_bank_list
+```
+
+```{r}
+# removes CSV extension from "worldbank_filenames"
+worldbank_filenames_base<-str_remove(worldbank_filenames, ".csv")
+```
+
+```{r}
+# assigns names to datasets in "world_bank_list"
+names(world_bank_list)<-worldbank_filenames_base
+```
+
+```{r}
+#| eval: false
+# extracts fdi dataset from "world_bank_list" by assigned name
+world_bank_list[["wdi_fdi2019"]]
+```
+
+```{r}
+#| echo: false
+head(world_bank_list[["wdi_fdi2019"]])
+```
+
+## Joining Data
+
+```{r}
+# extracts fdi dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_fdi"
+wdi_fdi<-world_bank_list[["wdi_fdi2019"]]
+```
+
+```{r}
+# extracts debt dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_debt"
+wdi_debt<-world_bank_list[["wdi_debt2019"]]
+```
+
+```{r}
+# drop na's in debt and FDI datasets and rename variables
+wdi_debt<-wdi_debt %>%
+            drop_na() %>% 
+            rename(debt_2019=`2019 [YR2019]`)
+
+wdi_fdi<-wdi_fdi %>% 
+            drop_na() %>% 
+            rename(fdi_2019=`2019 [YR2019]`)
+```
+
+```{r}
+# join together "wdi_fdi" and "wdi_fdi" using country code
+debt_fdi_join<-full_join(wdi_fdi, wdi_debt, by="Country Code")
+```
+
+## Appending Data
+
+```{r}
+# extracts worldbank FDI data from "world_bank_list" and assigns it to the object "worldbank_fdi_2019"
+worldbank_fdi_2019<-world_bank_list[["wdi_fdi2019"]]
+
+# extracts worldbank trade data from "world_bank_list" and assigns it to the object "worldbank_trade_2019"
+worldbank_trade_2019<-world_bank_list[["wdi_trade2019"]]
+```
+
+```{r}
+# Appends "worldbank_trade_2019" to "worldbank_fdi_2019" and assigns new dataset to object named "worldbank_trade_fdi"
+worldbank_trade_fdi<-bind_rows(worldbank_fdi_2019, worldbank_trade_2019)
+```
+
+## Reshaping Data
+
+### Long to Wide
+
+```{r}
+# cleans the dataset before reshaping
+worldbank_trade_fdi_cleaned<-worldbank_trade_fdi %>% 
+                              rename(economic_variables="2019 [YR2019]",
+                                     series_code="Series Code") %>% 
+                              select(-"Series Name") %>% 
+                              drop_na()
+                      
+                                      
+```
+
+```{r}
+# converts "economic_variables" to numeric
+worldbank_trade_fdi_cleaned$economic_variables<-as.numeric(worldbank_trade_fdi_cleaned$economic_variables)
+```
+
+```{r}
+# reshapes "worldbank_trade_fdi_cleaned" from long to wide and assigns the wide dataset to an object named "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_cleaned %>% 
+                              tidyr:: pivot_wider(names_from=series_code,
+                                          values_from=economic_variables)
+```
+
+```{r}
+# renames columns in "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide<-worldbank_trade_fdi_wide %>% 
+                          rename(trade=NE.TRD.GNFS.ZS,
+                                 FDI=BX.KLT.DINV.WD.GD.ZS)
+```
+
+```{r}
+#| eval: false
+# Views "worldbank_trade_fdi_wide" in the Viewer
+View(worldbank_trade_fdi_wide)
+```
+
+```{r}
+#| echo: false
+worldbank_trade_fdi_wide %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+### Wide to Long
+
+```{r}
+# reshapes "worldbank_trade_fdi_wide" back to long format and assigns the reshaped dataset to a new object named "world_bank_trade_long"
+world_bank_trade_long<-worldbank_trade_fdi_wide %>% 
+                        pivot_longer(cols=c(FDI, trade),
+                                     names_to="economic_variable",
+                                     values_to = "2019")
+                        
+```
+
+## Automating Data Processing with Functions
+
+```{r}
+# write function to clean World Bank dataset
+worldbank_cleaning_function<-function(input_dataset){
+  modified_dataset<-input_dataset %>% 
+                      select(-"Series Code") %>% 
+                      rename("Country"="Country Name",
+                             "CountryCode"="Country Code",
+                             "Series"="Series Name",
+                             "2019"="2019 [YR2019]") %>% 
+                      drop_na(CountryCode)
+  return(modified_dataset)
+}
+```
+
+```{r}
+# Iteratively apply "worldbank_cleaning_function" to all of the datasets in "world_bank_list", and deposit the cleaned datasets into a new list named "world_bank_list_cleaned"
+world_bank_list_cleaned<-map(world_bank_list, worldbank_cleaning_function)
+```
+
+# Data Transfer Part 2: Exporting Data
+
+## Exporting a Data Frame
+
+```{r}
+# exports "worldbank_trade_fdi_wide" to a local directory
+write_csv(worldbank_trade_fdi, "outputs/worldbank_trade_fdi.csv")
+```
+
+## Exporting a Summary Statistics Table
+
+```{r}
+#| eval: false
+# writes summary statistics table "pt_copy_summarystats1_df"  as CSV
+write.csv(pt_copy_summarystats1, "outputs/summary_statistics.csv", row.names = TRUE)
+```
+
+```{r}
+# exports a text summary stats table with stargazer
+stargazer(as.data.frame(pt_copy), type="text", title="Descriptive Statistics", digits=1, out="outputs/summary_stats.txt")
+
+```
+
+```{r}
+# exports an html summary stats table with stargazer
+stargazer(as.data.frame(pt_copy), type = "text", title = "Descriptive Statistics", digits = 1, out = "outputs/summary_stats.html")
+
+```
+
+## Exporting Regression Tables
+
+```{r}
+#| results: hide
+# makes list container for regressions we want to export
+regression_list<-list(regression1, regression2, regression3)
+```
+
+```{r}
+#| results: hide
+# exports regressions in "regression_list" via stargazer as html
+stargazer(regression_list, type="html", out="outputs/cgexp_regressions.html")
+```
+
+```{r}
+#| results: hide
+
+# exports regressions in "regression_list" via stargazer as text file
+stargazer(regression_list, type="text", out="outputs/cgexp_regressions.txt")
+```
+
+## Iteratively Exporting Multiple Data Frames
+
+```{r}
+# create file names for exported World Bank files
+WB_filenames_export<-paste0("outputs/", worldbank_filenames_base, "_cleaned.csv")
+```
+
+```{r}
+# exports datasets in "world_bank_list_cleaned" to "outputs" directory using filenames in "WB_filenames_export"
+walk2(world_bank_list_cleaned, WB_filenames_export, write_csv)
+```
+
+# Exercises
