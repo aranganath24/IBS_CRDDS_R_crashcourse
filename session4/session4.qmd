@@ -191,7 +191,7 @@ pt_copy_cleaned<-pt_copy %>% drop_na(cgexp, trade)
 Now, we're ready to make our scatterplot. The code below generates a scatterplot of the "cgexp" variable (on the x axis) and the "trade" variable (on the y-axis) for all observations in the `pt_copy` dataset, and assigns it to a new object named `scatter_cgexp_trade`:
 
 ```{r}
-# Creates scatterplot with "cgexp" variable on x-axis and "trade" variiable on y-axis and assigns to object named "scatter_cgexp_trade"
+# Creates scatterplot with "cgexp" variable on x-axis and "trade" variable on y-axis and assigns to object named "scatter_cgexp_trade"
 scatter_cgexp_trade<-
   ggplot(pt_copy_cleaned)+
   geom_point(aes(x=cgexp, y=trade))+
@@ -342,7 +342,7 @@ summary(regression1)
 The process for multivariate regression is much the same as for bivariate regression; we simply add the additional independent variables after with a "+" sign. Below, we compute a regression with additional covariates and assign it to the object named `regression2`:
 
 ```{r}
-# Implements regression with "gexp" as DV, and assigns to object named "regression1"
+# Implements regression with "cgexp" as DV, and assigns to object named "regression2"
 regression2<-lm(cgexp~gastil+lyp+trade+prop1564+prop65+federal+oecd, data=pt_copy)
 ```
 
@@ -580,7 +580,7 @@ wdi_fdi<-world_bank_list[["wdi_fdi2019"]]
 Then, we'll extract the World Bank trade dataset and assign it to an object named `wdi_trade`:
 
 ```{r}
-# extracts debt dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_debt"
+# extracts debt dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_trade"
 wdi_trade<-world_bank_list[["wdi_trade2019"]]
 ```
 
