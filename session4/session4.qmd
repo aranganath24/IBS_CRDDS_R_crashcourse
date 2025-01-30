@@ -82,7 +82,7 @@ cgexp_africa<-
   ggplot(pt_africa)+
   geom_col(aes(x=country, y=cgexp))+
   labs(
-    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries\n(1990-1998 Average)",
     x="Country Name", 
     y="CGEXP")+
   theme(plot.title=element_text(hjust=0.5),
@@ -111,7 +111,7 @@ cgexp_africa_ascending<-
   ggplot(pt_africa)+
   geom_col(aes(x=reorder(country, cgexp), y=cgexp))+
   labs(
-    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries\n(1990-1998 Average)",
     x="Country Name", 
     y="CGEXP")+
   theme(plot.title=element_text(hjust=0.5),
@@ -134,7 +134,7 @@ cgexp_africa_descending<-
   ggplot(pt_africa)+
   geom_col(aes(x=reorder(country, -cgexp), y=cgexp))+
   labs(
-    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries\n(1990-1998 Average)",
     x="Country Name", 
     y="CGEXP")+
   theme(plot.title=element_text(hjust=0.5),
