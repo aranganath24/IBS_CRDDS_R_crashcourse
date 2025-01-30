@@ -13,51 +13,17 @@ editor: visual
 
 # Introduction
 
-In the past two sessions, we presented some ideas, concepts, and tools that provide a basic foundation for working with data in R. Now that we have this basic foundation, we'll turn in this session to a more applied exploration of some actual datasets. Our goal here is to introduce you to some useful functions that will allow you to explore and begin making sense of actual datasets in R. This lesson will provide a tour of various functions that can be particularly helpful as you get started cleaning, wrangling, and analyzing your data in R. Among the topics we'll cover today are:
-
--   Loading data into R
-
--   Handling missing data
-
--   Summary Statistics in R
-
--   Data cleaning and processing
+In this session we'll cover the following topics:
 
 -   Basic analysis (correlations and regressions)
 
--   Joining Data
+-   Exploratory visualization with *ggplot2*
 
--   Reshaping Data
+-   Integrating and working with multiple datasets (i.e. joining, appending, reshaping, iteratively processing)
 
 -   Exporting data out of R
 
-We will be working with a handful of datasets, which you will need to [download](https://www.dropbox.com/scl/fo/2aianyhhdx92auh9aa6l2/AP1MzlzGD3KL2YBI-o9I4v4?rlkey=tm7z8sr0sxpjm5uquu154ni99&st=2a34xm00&dl=0). We will primarily be working with a crossnational dataset collected and made public by the economists Torsten Persson and Guido Tabellini; it's one of the datasets they work with in their highly influential book, entitled "The Economic Effects of Constitutions." The codebook for the dataset is provided along with the data in the downloaded materials. We'll also be working with some datasets collected from the World Bank's [World Development Indicators](https://databank.worldbank.org/source/world-development-indicators).Installing Packages and Loading Libraries
-
-Please go ahead and install any of the packages below that you have not already installed.
-
-```{r chunk1}
-#| eval: FALSE
-
-# Install packages using the "install.packages" function
-install.packages("tidyverse")
-install.packages("psych")
-install.packages("janitor")
-install.packages("fastDummies")
-install.packages("stargazer")
-install.packages("gtsummary")
-install.packages("ggeffects")
-```
-
-Note that when you need to install a lot of packages at once, you can put the names of the packages you'd like to install into a character vector and pass it to the `install.packages()` function:
-
-```{r chunk2}
-#| eval: FALSE
-
-# Installing multiple packages by passing package names as strings to the "install.packages" function
-install.packages(c("tidyverse", "psych", "janitor", "fastDummies"))
-```
-
-Remember to load the required libraries (even packages you've already installed before).
+We will continue working with the Persson-Tabellini dataset. We will also work with some World Bank datasets that you should have downloaded yesterday. Please load all of the libraries you loaded yesterday:
 
 ```{r test3}
 #| warning: FALSE
@@ -89,6 +55,212 @@ pt<-read_csv("data/pt/persson_tabellini_workshop.csv")
 
 # makes dataset copy
 pt_copy<-pt
+```
+
+# Visualization with *ggplot2* 
+
+In this section, we'll discuss how to use *ggplot2* to visualize our data. *ggplot2* is the *tidyverse*'s visualization package, and is rooted in a framework known as the "grammar of graphics" (in fact, the "gg" in *ggplot2* stands for "grammar of graphics"). The basic idea behind the grammar of graphics is that we create visualizations by layering different elements on top of each other. For example, the foundational layer is the data used to create the plot. Another element layered on top of the data is a visualization's aesthetic (often referred to as "aes"), which specifies how the underlying data is mapped onto the visual properties of the visualization. For example, features like color, size, and shape can be used to distinguish different groups or points in the data, and are considered part of the aesthetic layer. On top of the data and aesthetics, we can layer geometries, which specify how the data is represented in terms of visual geometries (i.e. points, lines, bars etc.). Other elements include themes, which refer to properties of the plot that are not directly tied to the plot (such as background color, text positioning, and font sizes), but which can meaningfully shape the visualization's appearance and a viewer's ability to engage with it. The syntax of *ggplot2* corresponds to the concept of the grammar of graphics; different functions correspond to different "layers" in the grammar of graphics, and are layered on top of each other with a "+" sign, building out the visualization element by element.
+
+*ggplot2* is a remarkable package, and builds on R's prior strengths as a data visualization platform. It's possible to make beautiful visualizations using *ggplot2*, but our focus here will be on getting acquainted with the basic syntax of the package, and making some quick exploratory visualizations based on data from the `pt_copy` dataset.
+
+## Bar Charts
+
+Let's start by making some simple bar charts for the African countries in `pt_copy`. Let’s say we want to make a bar chart that displays variation in the “cgexp” variable (central government expenditure as a share of GDP) for African countries. We’ll begin by extracting the Africa observations from `pt_copy` using the `filter()` function, and removing any “NA” observations for this variable from the dataset using the `drop_na()` function:
+
+```{r}
+# filters Africa observations
+pt_africa<-pt_copy %>% 
+            filter(continent=="africa") %>% 
+            drop_na(cgexp)
+```
+
+Now, let's make a basic bar chart of the "cgexp" data from `pt_africa`, and assign it to an object named `cgexp_africa`:
+
+```{r}
+# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations and assigns the plot to an object named "cgexp_africa"
+cgexp_africa<-
+  ggplot(pt_africa)+
+  geom_col(aes(x=country, y=cgexp))+
+  labs(
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    x="Country Name", 
+    y="CGEXP")+
+  theme(plot.title=element_text(hjust=0.5),
+        axis.text.x = element_text(angle = 90))
+```
+
+Let's unpack the code above:
+
+-   The expression `ggplot(pt_africa)` specifies that we want to initialize *ggplot*, and declares the dataset containing the data we want to map ("pt_africa")
+-   `geom_col()` indicates that we want to make a bar chart. If you wanted to make a different type of chart, this function would be different. Within the `geom_col()` function, we indicate our desired aesthetic mapping `aes()`; an aesthetic mapping indicates how we would like variables in the datasets to be represented on the chosen visualization. Here, the expression `x=country, y=cgexp` simply indicates that we want countries to be represented on the x-axis of the chart, and the "cgexp" variable to be represented on the y-axis.
+-   The arguments to the `labs()` function (short for "labels") specify a desired title for the visualization, and x-axis and y-axis labels.
+-   The arguments to the `theme()` function specify a desired position for the plot title, and a desired format for the x-axis labels.
+
+Let's see what `cgexp_africa` looks like:
+
+```{r}
+# prints contents of cgexp_africa
+cgexp_africa
+```
+
+This is a nice start, but it may look a bit cleaner if we arrayed the chart in ascending order with respect to the cgexp variable. To do so, we can slightly change our aesthetic mapping to look like this: `aes(x=reorder(country, cgexp), y=cgexp))`. This indicates that we'd still like the "cgexp" variable on the y-axis, and countries on the x-axis; however, we'd also like to order countries in ascending order with respect to the "cgexp" variable. We'll also lower the X-axis label a bit, to make it less crowded; we can do so with `axis.title.x=element_text(margin=margin(t=20)`. We'll assign this modified chart to a new object named `cgexp_africa_ascending`:
+
+```{r}
+# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations; countries are on the x axis and arrayed in ascending order with respect to the cgexp variable, which is on the y-axis; plot is assigned to an object named "cgexp_africa_ascending"
+cgexp_africa_ascending<-
+  ggplot(pt_africa)+
+  geom_col(aes(x=reorder(country, cgexp), y=cgexp))+
+  labs(
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    x="Country Name", 
+    y="CGEXP")+
+  theme(plot.title=element_text(hjust=0.5),
+        axis.text.x = element_text(angle = 90),
+        axis.title.x=element_text(margin=margin(t=20)))
+```
+
+All other apsects of the code are the same as before. Let's see what the modified chart looks like:
+
+```{r}
+# prints "cgexp_africa_ascending"
+cgexp_africa_ascending
+```
+
+If, instead of arranging the countries in ascending order with respect to the "cgexp" variable, we want to arrange them in descending order, we can simply put a "-" before "cgexp" within the aesthetic mapping; we'll assign the modified chart to a new object named `cgexp_africa_descending`:
+
+```{r}
+# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations; countries are on the x axis and arrayed in descending order with respect to the cgexp variable, which is on the y-axis; plot is assigned to an object named "cgexp_africa_descending"
+cgexp_africa_descending<-
+  ggplot(pt_africa)+
+  geom_col(aes(x=reorder(country, -cgexp), y=cgexp))+
+  labs(
+    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
+    x="Country Name", 
+    y="CGEXP")+
+  theme(plot.title=element_text(hjust=0.5),
+        axis.text.x = element_text(angle = 90),
+        axis.title.x=element_text(margin=margin(t=20)))
+```
+
+Let's see how the `cgexp_africa_descending` plot now looks:
+
+```{r}
+# prints contents of "cgexp_africa_descending"
+cgexp_africa_descending
+```
+
+Sometimes, you may wish to invert the axes of your charts, which you can do using the `coord_flip()` function. The code below takes the `cgexp_africa_ascending` chart we created above, inverts the axes using `coord_flip()`, and assigns the result to a new object named `cgexp_africa_ascending_inverted`:
+
+```{r}
+# creates a sideways bar chart using the "coord_flip" function and assigns it to a new object named "cgexp_africa_ascending_inverted"  
+cgexp_africa_ascending_inverted<-cgexp_africa_ascending+
+                                    coord_flip()
+```
+
+```{r}
+# prints "cgexp_africa_ascending_inverted"
+cgexp_africa_ascending_inverted
+```
+
+When we use `coord_flip()` in *ggplot2* it flips the axes (i.e. the x-axis becomes the y-axis and vice versa). As a result, the (now) x-axis labels in `cgexp_africa_ascending_inverted` are difficult to read, and need to be adjusted. We can do so by modifying the "axis.text.x" argument within the `theme()` function:
+
+```{r}
+# fixes x axis labels
+cgexp_africa_ascending_inverted<-cgexp_africa_ascending_inverted+
+                                    theme(axis.text.x = element_text(angle = 0))
+                                    
+```
+
+Let's see what the plot looks like now:
+
+```{r}
+# prints contents of "cgexp_africa_ascending_inverted"
+cgexp_africa_ascending_inverted
+```
+
+## Scatterplots
+
+The syntax to make a scatterplot is fairly similar to the syntax used to create a bar chart; the main difference is that instead of using the `geom_col()` function to indicate that we want a bar chart, we use the `geom_point()` function to indicate that we want a scatterplot. We will be creating scatterplots of the "cgexp" and "trade" variables, so we'll start by cleaning `pt_copy` to prepare it for visualization. In particular, we'll remove NA values for these two variables, and assign this version of the dataset to an object named `pt_copy_cleaned`:
+
+```{r}
+# removes rows with NA values for "cgexp" and "trade; assigns cleaned dataset to object named "pt_copy_cleaned"
+pt_copy_cleaned<-pt_copy %>% drop_na(cgexp, trade)
+
+```
+
+Now, we're ready to make our scatterplot. The code below generates a scatterplot of the "cgexp" variable (on the x axis) and the "trade" variable (on the y-axis) for all observations in the `pt_copy` dataset, and assigns it to a new object named `scatter_cgexp_trade`:
+
+```{r}
+# Creates scatterplot with "cgexp" variable on x-axis and "trade" variiable on y-axis and assigns to object named "scatter_cgexp_trade"
+scatter_cgexp_trade<-
+  ggplot(pt_copy_cleaned)+
+  geom_point(aes(x=cgexp, y=trade))+
+  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
+       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
+  theme(plot.title=element_text(hjust=0.5)) 
+```
+
+Let's see what `scatter_cgexp_trade` looks like:
+
+```{r}
+# prints contents of "scatter_cgexp_trade"
+scatter_cgexp_trade
+```
+
+Sometimes, we may wish to distinguish between different groups in a scatterplot. One way to do that is to assign different colors to different groups of interest. For example, if we wanted to distinguish continents in the scatterplot, we could specify `color=continent` in the aesthetic mapping. The code below does so, and assigns the result to a new object named `scatter_cgexp_trade_grouped`:
+
+```{r}
+# Creates scatterplot with "cgexp" variable on x-axis and "trade" variable on y-axis, and uses different color points for different continents; plot is assigned to object named "scatter_cgexp_trade_grouped"
+scatter_cgexp_trade_grouped<-
+  ggplot(pt_copy_cleaned)+
+  geom_point(aes(x=cgexp, y=trade, color=continent))+
+  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
+       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
+  theme(plot.title=element_text(hjust=0.5)) 
+```
+
+Let's see what `scatter_cgexp_trade_grouped` looks like:
+
+```{r}
+# prints contents of "scatter_cgexp_trade_grouped"
+scatter_cgexp_trade_grouped
+```
+
+An alternative way of parsing categories is to use facets, which create separate visualizations for each of the different categories in a dataset. Below, for example, we create separate scatterplots for each continent (this is specified by the final line in the code, `facet_wrap(~continent, nrow=2))`:
+
+```{r}
+# Creates continent-level subplots for scatterplot, using facets; assigns plot to new object named "scatter_cgexp_trade_facets"
+scatter_cgexp_trade_facets<-
+  ggplot(pt_copy_cleaned) + 
+  geom_point(aes(x = cgexp, y = trade)) + 
+  facet_wrap(~ continent, nrow = 2)
+```
+
+Let's print the contents of `scatter_cgexp_trade_facets`:
+
+```{r}
+# prints "scatter_cgexp_trade_facets"
+scatter_cgexp_trade_facets
+```
+
+Finally, it's important to note that it's possible to layer different geometries over each other. For example, the code below plots a scatterplot for the `pt_copy` dataset with the "cgexp" variable on the x axis and the trade variable on the y-axis, but also plots a line of best fit on top of the scatterplot with `geom_smooth(aes(x=cgexp, y=trade), method="lm")`; we'll assign the resulting plot to `scatter_cgexp_trade_line`:
+
+```{r}
+# Creates scatterplot with "cgexp" variable on x-axis and "trade" variiable on y-axis, adds line of best fit; plot assigned to object named "scatter_cgexp_trade_line"
+scatter_cgexp_trade_line<-
+  ggplot(pt_copy_cleaned)+
+  geom_point(aes(x=cgexp, y=trade))+
+  geom_smooth(aes(x=cgexp, y=trade), method="lm")+
+  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
+       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
+  theme(plot.title=element_text(hjust=0.5)) 
+```
+
+Let's see what it looks like:
+
+```{r}
+# Prints contents of "scatter_cgexp_trade_line"
+scatter_cgexp_trade_line
 ```
 
 # Elementary Data Analysis
@@ -308,245 +480,82 @@ Now, let's go ahead and print the contents of `marginal_effect_federalism`:
 marginal_effect_federalism
 ```
 
-This table indicates the predicted value for the "cgexp" variable for non-federal (`federal=0`) countries is 29.43, while the predicted value for federal (`federal=1`) countries is 25.52. So on average, the GDP share of central government expenditure is about 3.91 points higher for non-federal countries. The table also provides confidence intervals for these predicted values, and just by eyeballing them, it looks like there's quite a bit of overlap in them, indicating that the difference is probably not statistically significant. Below, we'll learn how to graph this table; a visual representation of the marginal effects can allow us to quickly make sense of the relationships in the data when there are interaction effects present.
-
-# Visualization with *ggplot2* 
-
-In this section, we'll discuss how to use *ggplot2* to visualize our data. *ggplot2* is the *tidyverse*'s visualization package, and is rooted in a framework known as the "grammar of graphics" (in fact, the "gg" in *ggplot2* stands for "grammar of graphics"). The basic idea behind the grammar of graphics is that we create visualizations by layering different elements on top of each other. For example, the foundational layer is the data used to create the plot. Another element layered on top of the data is a visualization's aesthetic (often referred to as "aes"), which specifies how the underlying data is mapped onto the visual properties of the visualization. For example, features like color, size, and shape can be used to distinguish different groups or points in the data, and are considered part of the aesthetic layer. On top of the data and aesthetics, we can layer geometries, which specify how the data is represented in terms of visual geometries (i.e. points, lines, bars etc.). Other elements include themes, which refer to properties of the plot that are not directly tied to the plot (such as background color, text positioning, and font sizes), but which can meaningfully shape the visualization's appearance and a viewer's ability to engage with it. The syntax of *ggplot2* corresponds to the concept of the grammar of graphics; different functions correspond to different "layers" in the grammar of graphics, and are layered on top of each other with a "+" sign, building out the visualization element by element.
-
-*ggplot2* is a remarkable package, and builds on R's prior strengths as a data visualization platform. It's possible to make beautiful visualizations using *ggplot2*, but our focus here will be on getting acquainted with the basic syntax of the package, and making some quick exploratory visualizations based on data from the `pt_copy` dataset.
-
-## Bar Charts
-
-Let's start by making some simple bar charts for the African countries in `pt_copy`. Let’s say we want to make a bar chart that displays variation in the “cgexp” variable (central government expenditure as a share of GDP) for African countries. We’ll begin by extracting the Africa observations from `pt_copy` using the `filter()` function, and removing any “NA” observations for this variable from the dataset using the `drop_na()` function:
+This table indicates the predicted value for the "cgexp" variable for non-federal (`federal=0`) countries is 29.43, while the predicted value for federal (`federal=1`) countries is 25.52. So on average, the GDP share of central government expenditure is about 3.91 points higher for non-federal countries. The table also provides confidence intervals for these predicted values, and just by eyeballing them, it looks like there's quite a bit of overlap in them, indicating that the difference is probably not statistically significant. Creating a visual representation of the marginal effects could allow us to communicate this much more quickly and intuitively. Let's use *ggplot*2 to make a quick visualization of `marginal_effect_federalism`. Before doing so, it's useful to note that when we print the contents of `marginal_effect_federalism` to the console, it's specially formatted; in fact, that object is a data frame, and we can view it's actual underlying structure by explicitly printing it as a data frame:
 
 ```{r}
-# filters Africa observations
-pt_africa<-pt_copy %>% 
-            filter(continent=="africa") %>% 
-            drop_na(cgexp)
+# prints underlying structure of "marginal_effect_federalism"
+print(as.data.frame(marginal_effect_federalism))
 ```
 
-Now, let's make a basic bar chart of the "cgexp" data from `pt_africa`, and assign it to an object named `cgexp_africa`:
+Having this in front of us can make the process of translating the `marginal_effect_federalism` into a plot more intuitive. Let's go ahead and make our plot, which we'll assign to an object named `marginal_effect_federalism_plotted:`
 
 ```{r}
-# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations and assigns the plot to an object named "cgexp_africa"
-cgexp_africa<-
-  ggplot(pt_africa)+
-  geom_col(aes(x=country, y=cgexp))+
-  labs(
-    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
-    x="Country Name", 
-    y="CGEXP")+
-  theme(plot.title=element_text(hjust=0.5),
-        axis.text.x = element_text(angle = 90))
+# creates plot of "marginal_effect_federalism"; shows impact of federalism on cgexp when trade is held at means, with 95% confidence intervals
+marginal_effect_federalism_plotted<-
+  ggplot(marginal_effect_federalism)+
+    geom_point(aes(x=x, predicted))+
+    geom_errorbar(aes(x=x, ymin=conf.low, ymax=conf.high),width=0.05)+
+    scale_x_continuous(breaks=(seq(0,1, by=1)))+
+    labs(title="Predicted Effects of Federalism on Gov't Expenditure\n(with trade set to mean)", y="Predicted Expenditure", x="Federalism")
 ```
 
-Let's unpack the code above:
-
--   The expression `ggplot(pt_africa)` specifies that we want to initialize *ggplot*, and declares the dataset containing the data we want to map ("pt_africa")
--   `geom_col()` indicates that we want to make a bar chart. If you wanted to make a different type of chart, this function would be different. Within the `geom_col()` function, we indicate our desired aesthetic mapping `aes()`; an aesthetic mapping indicates how we would like variables in the datasets to be represented on the chosen visualization. Here, the expression `x=country, y=cgexp` simply indicates that we want countries to be represented on the x-axis of the chart, and the "cgexp" variable to be represented on the y-axis.
--   The arguments to the `labs()` function (short for "labels") specify a desired title for the visualization, and x-axis and y-axis labels.
--   The arguments to the `theme()` function specify a desired position for the plot title, and a desired format for the x-axis labels.
-
-Let's see what `cgexp_africa` looks like:
+The syntax should be fairly familiar. In the first line `ggplot(marginal_effect_federalism)`, we declare the data that's being plotted. Within the `geom_point()` function, `aes(x=x, predicted)` indicates that we want the dichotomous "federal" variable on the horizontal axis, and the predicted effects on the y-axis. Then, `geom_errorbar(aes(x=x, ymin=conf.low, ymax=conf.high),width=0.05)` formats and customizes the error bars; `x=x` tells *ggplot2* to place the error bar at the x values at the points, while `ymin=conf.low` and `ymax=conf.high` indicate the lower confidence bound (the bottom of the error bar) and the upper confidence bound (the top of the error bar) respectively. Thw "width" argument controls the thickness of the error bars. Next, `scale_x_continuous(breaks=(seq(0,1, by=1)))` tells *ggplot* to place tick marks at 0 and 1 on the x-axis, which is appropriate since our x variable ("federal") is a binary variable. The `labs()` function, of course, sets the labels. Let's see what the plot looks like:
 
 ```{r}
-# prints contents of cgexp_africa
-cgexp_africa
+# prints contents of "marginal_effect_federalism_plotted"
+marginal_effect_federalism_plotted
 ```
 
-This is a nice start, but it may look a bit cleaner if we arrayed the chart in ascending order with respect to the cgexp variable. To do so, we can slightly change our aesthetic mapping to look like this: `aes(x=reorder(country, cgexp), y=cgexp))`. This indicates that we'd still like the "cgexp" variable on the y-axis, and countries on the x-axis; however, we'd also like to order countries in ascending order with respect to the "cgexp" variable. We'll also lower the X-axis label a bit, to make it less crowded; we can do so with `axis.title.x=element_text(margin=margin(t=20)`. We'll assign this modified chart to a new object named `cgexp_africa_ascending`:
+# Integrating Datasets
 
-```{r}
-# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations; countries are on the x axis and arrayed in ascending order with respect to the cgexp variable, which is on the y-axis; plot is assigned to an object named "cgexp_africa_ascending"
-cgexp_africa_ascending<-
-  ggplot(pt_africa)+
-  geom_col(aes(x=reorder(country, cgexp), y=cgexp))+
-  labs(
-    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
-    x="Country Name", 
-    y="CGEXP")+
-  theme(plot.title=element_text(hjust=0.5),
-        axis.text.x = element_text(angle = 90),
-        axis.title.x=element_text(margin=margin(t=20)))
-```
-
-All other apsects of the code are the same as before. Let's see what the modified chart looks like:
-
-```{r}
-# prints "cgexp_africa_ascending"
-cgexp_africa_ascending
-```
-
-If, instead of arranging the countries in ascending order with respect to the "cgexp" variable, we want to arrange them in descending order, we can simply put a "-" before "cgexp" within the aesthetic mapping; we'll assign the modified chart to a new object named `cgexp_africa_descending`:
-
-```{r}
-# Creates a bar chart of the "cgexp" variable (central government expenditure as a share of GDP) for the Africa observations; countries are on the x axis and arrayed in descending order with respect to the cgexp variable, which is on the y-axis; plot is assigned to an object named "cgexp_africa_descending"
-cgexp_africa_descending<-
-  ggplot(pt_africa)+
-  geom_col(aes(x=reorder(country, -cgexp), y=cgexp))+
-  labs(
-    title="Central Govt Expenditure as Pct of GDP for Select African Countries (1990-1998 Average)",
-    x="Country Name", 
-    y="CGEXP")+
-  theme(plot.title=element_text(hjust=0.5),
-        axis.text.x = element_text(angle = 90),
-        axis.title.x=element_text(margin=margin(t=20)))
-```
-
-Let's see how the `cgexp_africa_descending` plot now looks:
-
-```{r}
-# prints contents of "cgexp_africa_descending"
-cgexp_africa_descending
-```
-
-Sometimes, you may wish to invert the axes of your charts, which you can do using the `coord_flip()` function. The code below takes the `cgexp_africa_ascending` chart we created above, inverts the axes using `coord_flip()`, and assigns the result to a new object named `cgexp_africa_ascending_inverted`:
-
-```{r}
-# creates a sideways bar chart using the "coord_flip" function and assigns it to a new object named "cgexp_africa_ascending_inverted"  
-cgexp_africa_ascending_inverted<-cgexp_africa_ascending+
-                                    coord_flip()
-```
-
-```{r}
-# prints "cgexp_africa_ascending_inverted"
-cgexp_africa_ascending_inverted
-```
-
-When we use `coord_flip()` in *ggplot2* it flips the axes (i.e. the x-axis becomes the y-axis and vice versa). As a result, the (now) x-axis labels in `cgexp_africa_ascending_inverted` are difficult to read, and need to be adjusted. We can do so by modifying the "axis.text.x" argument within the `theme()` function:
-
-```{r}
-# fixes x axis labels
-cgexp_africa_ascending_inverted<-cgexp_africa_ascending_inverted+
-                                    theme(axis.text.x = element_text(angle = 0))
-                                    
-```
-
-Let's see what the plot looks like now:
-
-```{r}
-# prints contents of "cgexp_africa_ascending_inverted"
-cgexp_africa_ascending_inverted
-```
-
-## Scatterplots
-
-The syntax to make a scatterplot is fairly similar to the syntax used to create a bar chart; the main difference is that instead of using the `geom_col()` function to indicate that we want a bar chart, we use the `geom_point()` function to indicate that we want a scatterplot. We will be creating scatterplots of the "cgexp" and "trade" variables, so we'll start by cleaning `pt_copy` to prepare it for visualization. In particular, we'll remove NA values for these two variables, and assign this version of the dataset to an object named `pt_copy_cleaned`:
-
-```{r}
-# removes rows with NA values for "cgexp" and "trade; assigns cleaned dataset to object named "pt_copy_cleaned"
-pt_copy_cleaned<-pt_copy %>% drop_na(cgexp, trade)
-
-```
-
-Now, we're ready to make our scatterplot. The code below generates a scatterplot of the "cgexp" variable (on the x axis) and the "trade" variable (on the y-axis) for all observations in the `pt_copy` dataset, and assigns it to a new object named `scatter_cgexp_trade`:
-
-```{r}
-# Creates scatterplot with "cgexp" variable on x-axis and "trade" variiable on y-axis and assigns to object named "scatter_cgexp_trade"
-scatter_cgexp_trade<-
-  ggplot(pt_copy_cleaned)+
-  geom_point(aes(x=cgexp, y=trade))+
-  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
-       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
-  theme(plot.title=element_text(hjust=0.5)) 
-```
-
-Let's see what `scatter_cgexp_trade` looks like:
-
-```{r}
-# prints contents of "scatter_cgexp_trade"
-scatter_cgexp_trade
-```
-
-Sometimes, we may wish to distinguish between different groups in a scatterplot. One way to do that is to assign different colors to different groups of interest. For example, if we wanted to distinguish continents in the scatterplot, we could specify `color=continent` in the aesthetic mapping. The code below does so, and assigns the result to a new object named `scatter_cgexp_trade_grouped`:
-
-```{r}
-# Creates scatterplot with "cgexp" variable on x-axis and "trade" variable on y-axis, and uses different color points for different continents; plot is assigned to object named "scatter_cgexp_trade_grouped"
-scatter_cgexp_trade_grouped<-
-  ggplot(pt_copy_cleaned)+
-  geom_point(aes(x=cgexp, y=trade, color=continent))+
-  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
-       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
-  theme(plot.title=element_text(hjust=0.5)) 
-```
-
-Let's see what `scatter_cgexp_trade_grouped` looks like:
-
-```{r}
-# prints contents of "scatter_cgexp_trade_grouped"
-scatter_cgexp_trade_grouped
-```
-
-An alternative way of parsing categories is to use facets, which create separate visualizations for each of the different categories in a dataset. Below, for example, we create separate scatterplots for each continent (this is specified by the final line in the code, `facet_wrap(~continent, nrow=2))`:
-
-```{r}
-# Creates continent-level subplots for scatterplot, using facets; assigns plot to new object named "scatter_cgexp_trade_facets"
-scatter_cgexp_trade_facets<-
-  ggplot(pt_copy_cleaned) + 
-  geom_point(aes(x = cgexp, y = trade)) + 
-  facet_wrap(~ continent, nrow = 2)
-```
-
-Let's print the contents of `scatter_cgexp_trade_facets`:
-
-```{r}
-# prints "scatter_cgexp_trade_facets"
-scatter_cgexp_trade_facets
-```
-
-Finally, it's important to note that it's possible to layer different geometries over each other. For example, the code below plots a scatterplot for the `pt_copy` dataset with the "cgexp" variable on the x axis and the trade variable on the y-axis, but also plots a line of best fit on top of the scatterplot with `geom_smooth(aes(x=cgexp, y=trade), method="lm")`; we'll assign the resulting plot to `scatter_cgexp_trade_line`:
-
-```{r}
-# Creates scatterplot with "cgexp" variable on x-axis and "trade" variiable on y-axis, adds line of best fit; plot assigned to object named "scatter_cgexp_trade_line"
-scatter_cgexp_trade_line<-
-  ggplot(pt_copy_cleaned)+
-  geom_point(aes(x=cgexp, y=trade))+
-  geom_smooth(aes(x=cgexp, y=trade), method="lm")+
-  labs(title="Trade Share of GDP \nas a function of\n Central Govt Expenditure (1990-1998 Average) ", 
-       x="Central Government Expenditure (Pct of GDP)", y="Overall Trade (Pct of GDP)")+
-  theme(plot.title=element_text(hjust=0.5)) 
-```
-
-Let's see what it looks like:
-
-```{r}
-# Prints contents of "scatter_cgexp_trade_line"
-scatter_cgexp_trade_line
-```
-
-Finally, before proceeding, let's quickly return to our marginal effects plot from the previous section, and use `ggplot2()` to plot the marginal effects for federalism from that regression model. Recall the output
-
-# Working With Multiple Datasets
+So far, we've only been working with a single dataset, but complex research projects typically require that multiple datasets are integrated or brought into conversation with each other. In this section, we'll review some tools and techniques that facilitate typical tasks involving multiple datasets.
 
 ## Data Transfer Part 2: Reading in Multiple Datasets
+
+Let's say that we have multiple datasets that we want to load into memory; in this case, we want to load the World Bank datasets in the "wb" directory of the data folder. The first step is to make a character vector of the file names we want to read in. The code below uses the `list.files()` function to extract the file names of the files in the "data/wb" directory to a character vector, which we'll assign to an object named "worldbank_filenames":
 
 ```{r}
 # prints the names of the files we want to read in and assigns the vector of strings to a new object named "worldbank_filenames" 
 worldbank_filenames<-list.files("data/wb")
 ```
 
+Let's confirm that the file names have been written correctly:
+
 ```{r}
-# reads world bank files into a list that is assigned to an object named "world_bank_list"
+# prints "worldbank_filenames"
+worldbank_filenames
+```
+
+Now, we'll use the `map()` function to iteratively pass the file names in the `worldbank_filenames` vector to the `read_csv()` function, and deposit the imported files into a list named `world_bank_list`:
+
+```{r}
+# iteratively passes file names in "worldbank_filenames" to the "read_csv" function, and deposits imported world bank files into a list that is assigned to an object named "world_bank_list"; assumes the working directory is the one with the world bank files
 setwd("data/wb")
 world_bank_list<-map(worldbank_filenames, read_csv)
 ```
+
+Now, let's go ahead print the contents of `world_bank_list`:
 
 ```{r}
 # prints contents of "world_bank_list"
 world_bank_list
 ```
 
+It could be useful to label the list elements of `world_bank_list`. For labels, it would make sense to use the file names in `worldbank_filenames`, without the ".csv" extension. Below, we use the `str_remove()` function to remove the ".csv" extension from the file names in `worldbank_filenames` and assign the result to a new object named `worldbank_filenames_base`:
+
 ```{r}
 # removes CSV extension from "worldbank_filenames"
 worldbank_filenames_base<-str_remove(worldbank_filenames, ".csv")
 ```
 
+Now, let's use the `names()` argument to assign the labels in `worldbank_filenames_base` to the elements in `world_bank_list`:
+
 ```{r}
 # assigns names to datasets in "world_bank_list"
 names(world_bank_list)<-worldbank_filenames_base
 ```
+
+Now that the file names are assigned, we can extract list elements by their labels:
 
 ```{r}
 #| eval: false
@@ -561,54 +570,88 @@ head(world_bank_list[["wdi_fdi2019"]])
 
 ## Joining Data
 
+Joining, or merging, distinct datasets into a single dataset based on a common variable that exists in both individual datasets is an essential operation in most research projects. To see how we can implement joins in R using the `join()` family of functions, let's first pull out two of the list elements in `world_bank_list` and assign them to objects in the global environment. First, we'll extract the dataset on foreign direct investment, and assign it to an object named `wdi_fdi`:
+
 ```{r}
 # extracts fdi dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_fdi"
 wdi_fdi<-world_bank_list[["wdi_fdi2019"]]
 ```
 
+Then, we'll extract the World Bank trade dataset and assign it to an object named `wdi_trade`:
+
 ```{r}
 # extracts debt dataset from "world_bank_list" by assigned name and assigns it to a new object named "wdi_debt"
-wdi_debt<-world_bank_list[["wdi_debt2019"]]
+wdi_trade<-world_bank_list[["wdi_trade2019"]]
 ```
 
-```{r}
-# drop na's in debt and FDI datasets and rename variables
-wdi_debt<-wdi_debt %>%
-            drop_na() %>% 
-            rename(debt_2019=`2019 [YR2019]`)
+Then, we'll clean up these datasets by dropping rows with NA values, and then renaming the awkwardly named "2019 \[YR2019'" variables in each of the datasets to something more intuitive and descriptive:
 
-wdi_fdi<-wdi_fdi %>% 
+```{r}
+# drop na's and rename variable in in trade dataset and assign to "wdi_trade_cleaned"
+wdi_trade_cleaned<-wdi_trade %>%
+            drop_na() %>% 
+            rename(trade_2019=`2019 [YR2019]`)
+
+# drop na's and rename variable in in FDI dataset and assign to "wdi_fdi_cleaned"
+wdi_fdi_cleaned<-wdi_fdi %>% 
             drop_na() %>% 
             rename(fdi_2019=`2019 [YR2019]`)
 ```
 
+Now, we can go ahead and use a `join()` function, to merge the datasets together. There are several different versions of the `join()` function, and you should read the documentation to learn more, and make sure you're applying the correct function given the context of your research (`?join`). We will use the `full_join()` function, which keeps all of the observations from each of the component datasets in the joined (i.e. output) dataset (even those that do not have a corresponding observation in the other dataset). Below, we call the `full_join()` function, and pass as arguments the two datasets we'd like to join. The specification `by="Country Code"` indicates that the join field (i.e. the common field that can be used to link the data frames) is the "Country Code" variable. The column containing the country codes is named "Country Code" in both columns, which makes this especially easy; if, however, the columns containing the join variable were named differently, we could equate them within the `full_join()` function by passing a vector to the "by" argument that specifies the join field from each component dataset. For example, if the country code variable was in a column named "iso3" in `wdi_fdi` and "Country Code" in `wdi_trade`, we could specify `by=c("iso3"="Country Code")` to let the function know that the join field in `wdi_fdi` is "iso3" and the join field in `wdi_trade` is "Country Code". Below, we assign the product of the join to a new object named `fdi_trade_join`:
+
 ```{r}
-# join together "wdi_fdi" and "wdi_fdi" using country code
-debt_fdi_join<-full_join(wdi_fdi, wdi_debt, by="Country Code")
+# join together "wdi_fdi_cleaned" and "wdi_fdi_cleaned" using country code
+fdi_trade_join<-full_join(wdi_fdi_cleaned, wdi_trade_cleaned, by="Country Code")
 ```
+
+Let's see what `fdi_trade_join` looks like by passing it to the R Studio Viewer:
+
+```{r}
+#| eval: false
+View(fdi_trade_join)
+```
+
+```{r}
+#| echo: false
+fdi_trade_join %>% datatable(extensions=c("Scroller", "FixedColumns"), options = list(
+  deferRender = TRUE,
+  scrollY = 350,
+  scrollX = 350,
+  dom = "t",
+  scroller = TRUE,
+  fixedColumns = list(leftColumns = 3)
+))
+```
+
+Note that both variables are now in the dataset as separate columns.
 
 ## Appending Data
 
-```{r}
-# extracts worldbank FDI data from "world_bank_list" and assigns it to the object "worldbank_fdi_2019"
-worldbank_fdi_2019<-world_bank_list[["wdi_fdi2019"]]
+If joining datasets is fundamentally about situating disparate datasets side-by-side in a new unified dataset, appending datasets is about stacking disparate datasets with a similar structure on top of each other in a new unified dataset. In other words, joining datasets leads to a unified dataset with more columns than the original individual datasets, while appending datasets leads to a unified dataset with more rows than the original individual datasets. Depending on the type of data you're working with, appending data can be just as important a method for bringing together disparate datasets.
 
-# extracts worldbank trade data from "world_bank_list" and assigns it to the object "worldbank_trade_2019"
-worldbank_trade_2019<-world_bank_list[["wdi_trade2019"]]
-```
+We can easily append data frames a single unified data frame using the `bind_rows()` function from *dplyr*. Below, we append `wdi_fdi`to `wdi_trade` by passing these objects as arguments to the `bind_rows()` function. We'll assign the appended dataset to a new object named `worldbank_trade_fdi_appended`:
 
 ```{r}
 # Appends "worldbank_trade_2019" to "worldbank_fdi_2019" and assigns new dataset to object named "worldbank_trade_fdi"
-worldbank_trade_fdi<-bind_rows(worldbank_fdi_2019, worldbank_trade_2019)
+worldbank_trade_fdi_appended<-bind_rows(wdi_trade, wdi_fdi)
 ```
+
+To confirm that the appending operation worked as expected, please view `worldbank_trade_fdi_appended` in the data viewer.
 
 ## Reshaping Data
 
+In a "wide" dataset, each variable or measurement is stored in a separate column; on the other hand, in a "long" dataset, each measurement is stored in a single column, and there is an additional column that identifies the specific variable or category for each observation. For example, in our context, `fdi_trade_join` is a "wide" dataset, while `worldbank_trade_fdi_appended` is formatted as a long dataset.
+
+The process of converting a wide dataset to a long one, or vice versa, is typically referred to as reshaping data. Often, one will need to bring different datasets together (either through a join or append operation), but in order to successfully implement the required procedure, it is first necessary to reshape at least one of the datasets so that they're correctly formatted. Below, we'll quickly review some functions for carrying out these reshaping operations from the *tidyr* package, which is part of the *tidyverse* suite.
+
 ### Long to Wide
+
+To see how a "long to wide" operation works using the *tidyr* lets imagine we want to transform `worldbank_trade_fdi_appended`, currently formatted as a long dataset, into a wide dataset. First we'll clean up `worldbank_trade_fdi_appended` using some familiar *tidyverse* functions, and assign the result to a new object named `worldbank_trade_fdi_cleaned` cleaned:
 
 ```{r}
 # cleans the dataset before reshaping
-worldbank_trade_fdi_cleaned<-worldbank_trade_fdi %>% 
+worldbank_trade_fdi_cleaned<-worldbank_trade_fdi_appended %>% 
                               rename(economic_variables="2019 [YR2019]",
                                      series_code="Series Code") %>% 
                               select(-"Series Name") %>% 
@@ -617,10 +660,21 @@ worldbank_trade_fdi_cleaned<-worldbank_trade_fdi %>%
                                       
 ```
 
+Before proceeding, we should note that the column containing the data, "economic_variables" is formatted as a character variable:
+
+```{r}
+# prints class of "economic_variables" column
+class(worldbank_trade_fdi_cleaned$economic_variables)
+```
+
+In order for the reshaping process to work, we need to transform that column into the "numeric" class, which we do with the following:
+
 ```{r}
 # converts "economic_variables" to numeric
 worldbank_trade_fdi_cleaned$economic_variables<-as.numeric(worldbank_trade_fdi_cleaned$economic_variables)
 ```
+
+Now, we use *tidyr*'s `pivote_wider` function to "pivot" the data from long to wide. Below, we'll take `worldbank_trade_fdi_cleaned` and then feed that data into the `pivot_wider()` function using the %\>% operator. Within the `pivot_wider()` function, the "names_from" argument specifies the current column that contains the names we would like to use as column names in the reshaped dataset, while the "values_from" argument specifies the name of the current column that contains the data that will be used to populate the columns in the reshaped dataset. We'll assign this code to a new object named `worldbank_trade_fdi_wide`:
 
 ```{r}
 # reshapes "worldbank_trade_fdi_cleaned" from long to wide and assigns the wide dataset to an object named "worldbank_trade_fdi_wide"
@@ -629,12 +683,29 @@ worldbank_trade_fdi_wide<-worldbank_trade_fdi_cleaned %>%
                                           values_from=economic_variables)
 ```
 
+Let's quickly take a look at the reshaped dataset:
+
+```{r}
+#| eval: false
+# prints contents of "worldbank_trade_fdi_wide"
+worldbank_trade_fdi_wide
+```
+
+```{r}
+#| echo: false
+head(worldbank_trade_fdi_wide)
+```
+
+It might be nice to rename the variables to something more intuitive:
+
 ```{r}
 # renames columns in "worldbank_trade_fdi_wide"
 worldbank_trade_fdi_wide<-worldbank_trade_fdi_wide %>% 
-                          rename(trade=NE.TRD.GNFS.ZS,
-                                 FDI=BX.KLT.DINV.WD.GD.ZS)
+                          rename(trade2019=NE.TRD.GNFS.ZS,
+                                 FDI2019=BX.KLT.DINV.WD.GD.ZS)
 ```
+
+Go ahead and inspect `worldbank_trade_fdi_wide` in the data viewer:
 
 ```{r}
 #| eval: false
@@ -656,16 +727,22 @@ worldbank_trade_fdi_wide %>% datatable(extensions=c("Scroller", "FixedColumns"),
 
 ### Wide to Long
 
+To make the conversion in the opposite direction, i.e. reshaping a dataset from wide to long, we can use the `pivot_longer()` function. Below, we take the `worldbank_trade_fdi_wide` data frame, and feed it into the `pivot_longer()` function using the `%>%` operator. Within the function, we use `cols=c(FDI2019, trade2019)` to specify the current columns that we're going to collapse into a single column in the new dataset. The "names_to" argument specifies the name of column that will hold the original "FDI2019" and "trade2019" columns, while the "values_to" argument specifies the name of the column that will actually hold the data. Let's go ahead and run the code, and assign the output to a new object named `world_bank_trade_long`:
+
 ```{r}
 # reshapes "worldbank_trade_fdi_wide" back to long format and assigns the reshaped dataset to a new object named "world_bank_trade_long"
 world_bank_trade_long<-worldbank_trade_fdi_wide %>% 
-                        pivot_longer(cols=c(FDI, trade),
+                        pivot_longer(cols=c(FDI2019, trade2019),
                                      names_to="economic_variable",
                                      values_to = "2019")
                         
 ```
 
+Please view `world_bank_trade_long` in the Viewer to confirm that it has been successfully reshaped.
+
 ## Automating Data Processing with Functions
+
+When working with multiple datasets, we may need to carry out identical operations on those datasets, in which case we could save time by wrapping up the relevant code in a function and iterating over the dataset elements we'd like to transform. Let's say, for example, that we want to clean up our World Bank dataset by deleting a column, renaming others, and removing the rows where the country code is NA. Rather than carrying out these operations individually, let's create a function, called `worldbank_cleaning_function`, that implements these changes and returns a clean dataset:
 
 ```{r}
 # write function to clean World Bank dataset
@@ -681,41 +758,78 @@ worldbank_cleaning_function<-function(input_dataset){
 }
 ```
 
+Let's test the function using `wdi_trade`:
+
 ```{r}
-# Iteratively apply "worldbank_cleaning_function" to all of the datasets in "world_bank_list", and deposit the cleaned datasets into a new list named "world_bank_list_cleaned"
-world_bank_list_cleaned<-map(world_bank_list, worldbank_cleaning_function)
+#| eval: false
+# passes "wdi_trade" to "worldbank_cleaning_function"
+worldbank_cleaning_function(wdi_trade)
 ```
 
-# Data Transfer Part 2: Exporting Data
+```{r}
+#| echo: false
+head(worldbank_cleaning_function(wdi_trade))
+
+```
+
+That looked like it worked, so lets go ahead and apply `worldbank_cleaning_function` to all of the data frames in `world_bank_list`. We'll use the familiar `map()` function to do so; below, `world_bank_list` is the list we're iterating over, while `worldbank_cleaning_function()` is the function we're applying:
+
+```{r}
+# Iteratively apply "worldbank_cleaning_function" to all of the datasets in "world_bank_list", and deposit the cleaned datasets into a new list named "world_bank_list_cleaned"
+world_bank_list_cleaned<-map(.x=world_bank_list, .f=worldbank_cleaning_function)
+```
+
+Print out the list, or use indexing to extract an element of the list (i.e. one of the cleaned datasets) and confirm that the operation worked.
+
+# Data Transfer Part 3: Exporting Data
+
+After working in R, we will likely need (at some point) to get R objects out of the program and onto our local directory. This section reviews some functions that can help export a variety of objects in various file formats.
 
 ## Exporting a Data Frame
 
+There are various functions to export a data frame in a variety of file formats. Typically, it's convenient to use the `write_csv()` function to export a data frame as a CSV file. Below, we export `worldbank_trade_fdi_wide` as a CSV to the "outputs" folder in our working directory. The first argument is the name of the object we want to export, while the second argument specifies the file path, name, and extension of the desired output file.
+
 ```{r}
 # exports "worldbank_trade_fdi_wide" to a local directory
-write_csv(worldbank_trade_fdi, "outputs/worldbank_trade_fdi.csv")
+write_csv(worldbank_trade_fdi_wide, "outputs/worldbank_trade_fdi.csv")
 ```
 
 ## Exporting a Summary Statistics Table
 
+If we want to export summary statistics, we can do so as a CSV. Recall the `pt_copy_summarystats1` file we created yesterday (i.e. a basic summary statistics table for the PT dataset), which we'll recreate here:
+
 ```{r}
-#| eval: false
+# recreates pt_copy_summarystats1
+pt_copy_summarystats1<-describe(pt_copy)
+```
+
+Instead of using the `write_csv()` function, we'll use the `write.csv()` function, which works similarly but allows us to specify that we want the row names of the data frame exported as well, which is useful in the context of summary statistics tables created by the *psych* package:
+
+```{r}
 # writes summary statistics table "pt_copy_summarystats1_df"  as CSV
 write.csv(pt_copy_summarystats1, "outputs/summary_statistics.csv", row.names = TRUE)
 ```
 
+We can also use the *stargazer* package to write out summary statistics for a data frame, either as a text file, as in this case:
+
 ```{r}
 # exports a text summary stats table with stargazer
-stargazer(as.data.frame(pt_copy), type="text", title="Descriptive Statistics", digits=1, out="outputs/summary_stats.txt")
+stargazer(as.data.frame(pt_copy), type="text", title="Descriptive Statistics", digits=2, out="outputs/summary_stats.txt")
 
 ```
 
+Or as an html file, as in this case
+
 ```{r}
+#| results: hide
 # exports an html summary stats table with stargazer
-stargazer(as.data.frame(pt_copy), type = "text", title = "Descriptive Statistics", digits = 1, out = "outputs/summary_stats.html")
+stargazer(as.data.frame(pt_copy), type = "html", title = "Descriptive Statistics", digits = 2, out = "outputs/summary_stats.html")
 
 ```
 
 ## Exporting Regression Tables
+
+Though there are other options, the best convenient way to export regression tables is with the *stargazer* package. To do so, we'll first specify a list containing the regressions we want to export, and assign them to a new object named `regression_list`:
 
 ```{r}
 #| results: hide
@@ -723,11 +837,15 @@ stargazer(as.data.frame(pt_copy), type = "text", title = "Descriptive Statistics
 regression_list<-list(regression1, regression2, regression3)
 ```
 
+Then, we can pass the list as an argument to the `stargazer()` function, which will either export it to the specified directory as an html file, as in this case:
+
 ```{r}
 #| results: hide
 # exports regressions in "regression_list" via stargazer as html
 stargazer(regression_list, type="html", out="outputs/cgexp_regressions.html")
 ```
+
+Or as a text file, as in this case:
 
 ```{r}
 #| results: hide
@@ -738,14 +856,67 @@ stargazer(regression_list, type="text", out="outputs/cgexp_regressions.txt")
 
 ## Iteratively Exporting Multiple Data Frames
 
+In order to export multiple data frames (for example, we may want to export a bunch of cleaned data frames out of R to use in another package) we can use the `walk()` function and its relatives; these functions are a part of the *purrr* package, and work similarly to the `map()` family of functions.
+
+Let's say we want to export the cleaned World Bank data frames in `world_bank_list_cleaned`. First, we'll create a vector of file names for the exported files using the `paste()` function. We'll assign this vector to a new object named `WB_filenames_export`:
+
 ```{r}
 # create file names for exported World Bank files
 WB_filenames_export<-paste0("outputs/", worldbank_filenames_base, "_cleaned.csv")
 ```
 
+Let's see what this looks like:
+
 ```{r}
-# exports datasets in "world_bank_list_cleaned" to "outputs" directory using filenames in "WB_filenames_export"
-walk2(world_bank_list_cleaned, WB_filenames_export, write_csv)
+# prints "WB_filenames_export" contents
+WB_filenames_export
 ```
 
+Now, we'll use the `walk2()` function to iteratively pass the data frames (contained in `world_bank_list_cleaned` and the file names contained in `WB_filenames_export` to the `write_csv()` function. The code below takes the first elements from `world_bank_list_cleaned` and `WB_filenames_export`, and passes them to `write_csv()` which exports the first data frame with the first file name; then, it takes the second elements from `world_bank_list_cleaned` and `WB_filenames_export`, and passes them to `write_csv()` which exports the second data frame with the second file name; and so on.
+
+```{r}
+# exports datasets in "world_bank_list_cleaned" to "outputs" directory using filenames in "WB_filenames_export"
+walk2(.x=world_bank_list_cleaned, .y=WB_filenames_export, write_csv)
+```
+
+Check your "outputs" directory to ensure that the files have been written out as expected.
+
+## Exporting Visualizations
+
+We can use the `ggsave()` function to export *ggplot2* visualizations out of R in a variety of file formats. For example, let's say we want to export `cgexp_africa_ascending_inverted` as a .png file:
+
+```{r}
+# exports "cgexp_africa_ascending_inverted" as .png file using "ggsave" function
+ggsave("outputs/africa_bar_chart.png", cgexp_africa_ascending_inverted, width=10, height=5)
+```
+
+The first argument contains the path, name, and desired file extension of the output file, while the second argument is the name of the object we want to write out. The "width" and "height" parameters set the dimensions of the output, and its useful to play around with these.
+
+Now, let's say that instead we want to export the file as a pdf; we can simply change the file extension:
+
+```{r}
+# exports "cgexp_africa_ascending_inverted" as .pdf file using "ggsave" function
+ggsave("outputs/africa_bar_chart.pdf", cgexp_africa_ascending_inverted, width=10, height=5)
+```
+
+If you have several visualizations that you want to save in a single file, you can use a graphics device. Below, we use a PDF graphics device to create a single PDF file (named “workshop_visualizations.pdf”) that contains the `cgexp_africa_ascending_inverted` and the `scatter_cgexp_trade_line` visualizations. We begin by calling the graphics device, and specifying the name and path of the desired output file, along with the dimensions. Then, we print the name of the visualizations to export, followed by `dev.off()` to turn off the device after the file has been exported.
+
+```{r}
+# exports multiple files using pdf graphics device
+pdf("outputs/workshop_visualizations.pdf", width=12, height=5)
+cgexp_africa_ascending_inverted
+scatter_cgexp_trade_line
+dev.off()
+```
+
+Check your directory to ensure that the "workshop_visualizations.pdf" file has been successfully exported, and contains both of the specified visualizations. There are graphics devices for other file types (such as png and jpeg) that work more or less analogously to the PDF graphics device.
+
 # Exercises
+
+*Exercise 1*
+
+Create a visualization using *ggplot2* using either the Persson-Tabellini dataset, one of the World Bank datasets, or a dataset of your choice and export it out of R as a PDF file.
+
+*Exercise 2*
+
+Write a function to perform some action(s) on one of the World Bank datasets, then iteratively apply that function to all of the World Bank datasets. Write out the transformed files to a local directory on your computer.
