@@ -15,7 +15,9 @@ editor: visual
 
 # R Projects
 
-## What is an R Project? 
+As you move forward in using R, the scope and complexity of your work will increase, which makes
+
+## What is an R Project?
 
 R Studio's "Project" feature has the potential to make your data management in R easier and more streamlined; it can also, in turn, make your work more reproducible and easier to share with others. An R Studio Project, quite simply, is a folder/directory in which you can store all of the materials associated with an R-based project, such as your raw data, your scripts, outputs (i.e. visualizations, processed data etc.), and reports. Project directories in R Studio come with a `.Rproj` file that establishes a self-contained workspace for your project. This R Project workspace has several useful features.
 
@@ -46,22 +48,197 @@ In short, R Projects offer meaningful benefits in the realm of project and data 
 
 To start an R Project, first go to **File** and click **New Project**:
 
-![Start a Project](pictures/pic2.png)
+```{r}
+#| echo: false
+#| fig-cap: "Start a Project"
+#| label: fig-plot-2
+knitr::include_graphics('pictures/pic2.png')
+```
 
-Then, select the option to start a project in a brand new working directory:
+Then select the option to start a project in a new working directory:
 
-![Start project in new working directory](pictures/pic3.png)
+```{r}
+#| echo: false
+#| fig-cap: "Create Project in New Directory"
+#| label: fig-plot-3
+knitr::include_graphics('pictures/pic3.png')
+```
 
 After that, select the **New Project** option:
 
 ![](pictures/pic5b.png)
 
-At this point, your project will be created (to confirm this, go to your project directory and confirm the existence of the **.RProj** file. You should configure your project directory something like in Figure 1, with sub-directories for your raw or unprocessed data, scripts, R outputs (like processed data and visualizations), and reports and documents. This will help you keep track of a project's many moving parts, and stay organized.
+You will then specify the location of the new R Project on your computer's directory:
+
+```{r}
+#| echo: false
+#| fig-cap: "Specify directory location"
+#| label: fig-plot-5
+knitr::include_graphics('pictures/pic5.png')
+```
+
+At this point, your project will be created (to confirm this, go to your project directory and confirm the existence of the **.RProj** file. You should configure your project directory something like in @fig-plot-1 , with sub-directories for your raw or unprocessed data, scripts, R outputs (like processed data and visualizations), and reports and documents. This will help you keep track of a project's many moving parts, and stay organized.
 
 Once the project is set up, you can open your project by double-clicking the **.RProj** files, within R Studio or from your project directory; this will launch R Studio with the correct settings and working directory.
 
-warning about project options
+Once a project is created, you can also set the project options by going to **Tools** in the R Studio menu bar, and then clicking **Project Options:**
 
-In short: project management, reproducibility and sharing
+```{r}
+#| echo: false
+#| fig-cap: "Project Options"
+#| label: fig-plot-6
+knitr::include_graphics('pictures/pic6.png')
+```
+
+This will bring you to a menu interface that looks like the following:
+
+```{r}
+#| echo: false
+#| fig-cap: "Project Options Menu"
+#| label: fig-plot-7
+knitr::include_graphics('pictures/pic7.png')
+```
+
+You can explore the various options, but it's generally recommended to set all of the workspace options to "No", especially if you are working on a research project that will ultimately be shared and published. **.RData** is a binary file that R uses to save your workspace (which includes all of the R object you create) across multiple sessions. Hadley Wickham, a leading R developer (particularly on the *tidyverse* suite we've been using extensively the past few days), recommends avoiding .RData, and saving all of your work in reproducible scripts that can precisely regenerate all of your work. Using scripts, rather than .RData, to keep track of your objects and work (and regenerate them as necessary) will make your work more reproducible, since it reduces the likelihood that you unknowingly carry over old objects into new work and create hidden dependencies in your code ( by relying on objects from a previous session that were not explicitly created in your current script). In addition, carrying over the workspace session to session may end up leading to a cluttered environment, with a lot of superfluous objects you can't keep track of. In short, rely on well-documented scripts, rather than **.RData** to track your work and restore your environment after closing a session; using **.RData** to save your workspace could be more convenient in the short run, but will likely be more painful in the long run.
 
 # Quarto
+
+Quarto is an open source publishing system that allows us to create a variety of outputs (such as reports, presentations, websites, and dashboards) that facilitate research related communications with a variety of audiences, including colleagues, collaborators and co-authors, students, and the public. It is compatible with a variety of programming languages, including R.
+
+One of the many benefits of Quarto is that it enables *literate programming*, a concept developed by the computer scientist. Literate programming is a practice in which the authors of code embed their code in human-readable documents that also contain narrative exposition of the code, and the actual outputs of the code, so that others can clearly understanding how the different parts of an analysis fit together. Among other things, literate programming facilitates transparency and clarity when communicating about the scripts used to generate research results. The lesson plans we've used in this workshop work within the literate programming paradigm, to the extent that it combines narrative text, blocks of code, and code outputs into an integrated document. While the lesson plans in this course
+
+## Making a New Quarto Document
+
+To start a new Quarto Document, open up R Studio, then click **New File**, then select **Quarto Document**:
+
+```{r}
+#| echo: false
+#| fig-cap: "Create New Quarto Document"
+#| label: fig-plot-8
+knitr::include_graphics('pictures/pic8.png')
+```
+
+Once you do so, it will bring up a menu like the one below; go ahead and give your document a name, and list your name as the author, then click **OK**:
+
+```{r}
+#| echo: false
+#| fig-cap: "Create New Quarto Document"
+#| label: fig-plot-9
+knitr::include_graphics('pictures/pic9.png')
+```
+
+Once you click OK, a new Quarto document, with file extension ".qmd" will be created. It'll look something like this:
+
+```{r}
+#| echo: false
+#| fig-cap: "Create New Quarto Document"
+#| label: fig-plot-10
+knitr::include_graphics('pictures/pic10.png')
+```
+
+The document comes prepopulated with some text that can serve as a useful guide to some relevant syntax.
+
+## Writing the Document
+
+A Quarto document is comprised of three main elements. First, there is the YAML header, which contains metadata for the entire document, and allows us to define document settings and set rules for how it will behave. Among many other things, you can use the YAML header to specify the desired output type (i.e. html, pdf, word), and define a table of contents. For example, see the YAML header associated for the first lesson plan we worked through on the first day of the workshop:
+
+```{r}
+#| echo: false
+#| fig-cap: "Sample YAML Header"
+#| label: fig-plot-11
+knitr::include_graphics('pictures/pic11.png')
+```
+
+Note that this is a pretty simple YAML header; as documents become more complex, these headers will tend to become more complex.
+
+Second, there is document text, which is formatted in the Markdown language. Markdown is extremely simple, and if you are not familiar with it, can quickly get started by consulting this [guide](https://www.markdownguide.org/basic-syntax/). You also have the option of formatting your text using the toolbar; from there, you can do all of the things you could also do with Markdown, such as add headers, add bullet points, format your text, add hyperlinks, and add images (among other things):
+
+```{r}
+#| echo: false
+#| fig-cap: "Formatting Toolbar"
+#| label: fig-plot-12
+knitr::include_graphics('pictures/pic12.png')
+```
+
+Finally, the third main components of a Quarto file are "code chunks", where you can create blocks of code which generate outputs embedded in the document. To create a code chunk you can go to to **Code** in the R Studio Menu bar up top, then click **Insert Chunk**. A perhaps easier way is to click the green "C" button in the Quarto menu:
+
+```{r}
+#| echo: false
+#| fig-cap: "Adding a Code Chunk"
+#| label: fig-plot-13
+knitr::include_graphics('pictures/pic13.png')
+```
+
+Then, you can add code (and code comments) within the code chunk, and run it by clicking the green arrow:
+
+```{r}
+#| echo: false
+#| fig-cap: "Running a Code Chunk"
+#| label: fig-plot-14
+knitr::include_graphics('pictures/pic14.png')
+```
+
+After you click the "Run" button, the, code will run and the result will print immediately below:
+
+```{r}
+#| echo: false
+#| fig-cap: "Output of Code Chunk"
+#| label: fig-plot-15
+knitr::include_graphics('pictures/pic15.png')
+```
+
+There are various ways to customize your code blocks and specify their behavior. For example, you can hide code blocks so that only the output is shown; you can also create code blocks that don't execute, so that the final report shows the code block without the output; you can suppress code warnings; and so on. For more information on the relevant syntax, see this [guide to Quarto](https://quarto.org/docs/computations/execution-options.html).
+
+## Rendering the Document
+
+Let's go ahead and modify the document; we'll delete the pre-populated text, and add our own heading, as well as another code chunk. The document looks something like this:
+
+```{r}
+#| echo: false
+#| fig-cap: "Updated File"
+#| label: fig-plot-16
+knitr::include_graphics('pictures/pic16.png')
+```
+
+Now, let's go ahead and save this .qmd file to the **documents-reports** directory within the R Project we created earlier. We can do so by clicking **File**, then **Save As**, then navigating to the directory and saving. We'll save the file as "quarto-example.qmd". Now that it's saved in the desired directory, we can render the html file by clicking the **Render** button in the Quarto Menu:
+
+```{r}
+#| echo: false
+#| fig-cap: "Render File"
+#| label: fig-plot-17
+knitr::include_graphics('pictures/pic17.png')
+```
+
+The rendered document should appear in either a separate window, or in your R Studio Viewer pane. You can choose where the document renders by clicking the small arrow next to the **Render** button, and clicking either **Preview in Window** or **Preview in Viewer Pane**:
+
+```{r}
+#| echo: false
+#| fig-cap: "Render File"
+#| label: fig-plot-18
+knitr::include_graphics('pictures/pic18.png')
+```
+
+If you choose to preview in the viewer pane, it'll look something like what you see below. Note the HTML preview on the right. This is a nice way of keeping track of what the rendered document looks like as you work:
+
+```{r}
+#| echo: false
+#| fig-cap: "Preview"
+#| label: fig-plot-19
+knitr::include_graphics('pictures/pic19.png')
+```
+
+Note that after rendering, an html file will also be created in the same directory as your .qmd file, and will update each time you render the .qmd file.
+
+# Exercises
+
+*Question 1*
+
+Create a new R Project that will serve as a "practice" workspace for you to continue practicing your R skills going forward, with the directory structure recommended earlier. In the Project, you may wish to add the scripts and data from our workshops. Check to make sure your scripts use relative paths with respect to the root project directory, and are able to run successfully. As you continue to practice R, you can add new scripts and data to this R Project, and keep all of your practice and skill-development work in one place.
+
+*Question 2*
+
+Create a new Quarto document, and use it to present the relevant code and output from previous practice exercises. Make sure to comment your code. Render the completed file as an html document.
+
+# Further Reading
+
+For more on Quarto, please see this [guide](https://quarto-tdg.org). More generally, if you wish to continue learning R, the best resource is the online book [R for Data Science](https://r4ds.hadley.nz). Please reach out to me if there are particular things you'd like to learn, and are looking for more tailored resources.
