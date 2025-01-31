@@ -57,7 +57,7 @@ pt<-read_csv("data/pt/persson_tabellini_workshop.csv")
 pt_copy<-pt
 ```
 
-# Visualization with *ggplot2* 
+# Visualization with *ggplot2*
 
 In this section, we'll discuss how to use *ggplot2* to visualize our data. *ggplot2* is the *tidyverse*'s visualization package, and is rooted in a framework known as the "grammar of graphics" (in fact, the "gg" in *ggplot2* stands for "grammar of graphics"). The basic idea behind the grammar of graphics is that we create visualizations by layering different elements on top of each other. For example, the foundational layer is the data used to create the plot. Another element layered on top of the data is a visualization's aesthetic (often referred to as "aes"), which specifies how the underlying data is mapped onto the visual properties of the visualization. For example, features like color, size, and shape can be used to distinguish different groups or points in the data, and are considered part of the aesthetic layer. On top of the data and aesthetics, we can layer geometries, which specify how the data is represented in terms of visual geometries (i.e. points, lines, bars etc.). Other elements include themes, which refer to properties of the plot that are not directly tied to the plot (such as background color, text positioning, and font sizes), but which can meaningfully shape the visualization's appearance and a viewer's ability to engage with it. The syntax of *ggplot2* corresponds to the concept of the grammar of graphics; different functions correspond to different "layers" in the grammar of graphics, and are layered on top of each other with a "+" sign, building out the visualization element by element.
 
