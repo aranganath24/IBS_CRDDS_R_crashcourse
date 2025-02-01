@@ -11,6 +11,15 @@ format:
 editor: visual
 ---
 
+```{r}
+#| message: false
+#| warning: false
+#| echo: true
+
+library(tidyverse)
+
+```
+
 # Introduction
 
 # R Projects
@@ -228,6 +237,110 @@ knitr::include_graphics('pictures/pic19.png')
 ```
 
 Note that after rendering, an html file will also be created in the same directory as your .qmd file, and will update each time you render the .qmd file.
+
+# R Projects, Quarto, and the *here()* package
+
+R Projects and Quarto are two essential R tools that enable data management, sharing, and communication, both with the scholarly community and the public. Though we've introduced these tools separately, it's likely you'll want to use them in conjunction (for instance, by placing your Quarto files and rendered documents within your R Projects). Indeed, we've already taken a step in this direction above, when we placed our **.qmd** file within our R project.
+
+As we discussed above, the R Project environment is a self-contained directory, where file paths can be set relative to the project's root directory (i.e. the highest-level directory within the R project, which contains the **.RProj** file). When working with Quarto, the program automatically sets the root directory for the code that's executed within the document's code to the same location as the **.qmd** file. When Quarto files are in an R Project, the working directory set by the location of the Quarto file overrides the working directory set by the R Project. More specifically, if the .qmd file is in the **documents-reports** directory, it will set that as its root directory; as a result, it would be impossible to access the data (in the **raw_data** folder) from the Quarto document using a relative path.
+
+To make this more concrete, let's first note the directory structure of the R Project root directory:
+
+```{r}
+#| echo: false
+#| fig-cap: "The R Project Root Directory"
+#| label: fig-plot-20
+knitr::include_graphics('pictures/pic20.png')
+```
+
+WIthin the **raw-data** sub-directory, there is another directory called **cc-data**, and within **cc-data**, there is a directory named **pt**, within which the **persson_tabellini_workshop.csv** data that we've using resides. Thus, the path to the data runs from the root directory runs as follows:
+
+**raw_data**–\>**cc-data**–\>**pt**–\>**persson_tabellini_workshop.csv**
+
+We can use this file path to read in the Persson-Tabellini data from a script stored in the **scripts** subdirectory. In particular, we could read the data in with the following:
+
+```{r}
+#| eval: false
+read_csv("raw_data/cc-data/pt/persson_tabellini_workshop.csv")
+
+```
+
+Within our sample R script, it looks like this:
+
+```{r}
+#| echo: false
+#| fig-cap: "Reading in data from a script in the script folder"
+#| label: fig-plot-21
+knitr::include_graphics('pictures/pic21.png')
+```
+
+Now, let's try to read the data in from within a **.qmd** in the **report-documents** subdirectory:
+
+```{r}
+#| echo: false
+#| fig-cap: "Error when running code chunk to set working directory in Quarto"
+#| label: fig-plot-22
+knitr::include_graphics('pictures/pic22.png')
+```
+
+Note that trying to run the code chunk throws an error, since the code chunk is interpreting the location of the **.qmd** file (the **report-documents** directory) as the root directory. As a result, the file path doesn't work; the code chunk is looking for the data in the **reports-documents** directory, but it doesn't exist there. As expected, attempts to render the document fail for the same reason; when the rendering process hits the code chunk that tries to read in the data, it fails, and the rendering process terminates:
+
+```{r}
+#| echo: false
+#| fig-cap: "Error when trying to render document as html"
+#| label: fig-plot-23
+knitr::include_graphics('pictures/pic23.png')
+```
+
+The easiest solution to this problem is to use the `here()` function from the *here* package, which automatically finds the root directory of the R Project you're working in (where the .Rproj file is) and builds paths from there. To see how it works, go ahead and install this package with the following:
+
+```{r}
+#| eval: false
+install.packages("here")
+
+```
+
+Then, load the *here* package at the top of your Quarto document by passing it to the `library()` function:
+
+```{r}
+#| eval: false
+library(here)
+
+```
+
+Then, whenever you need to read in data from your data directory into a **.qmd** file in another (i.e. **report-documents**) directory, simply use the `here()` function within that code chunk to set the working directory with respect to the project root. After setting the working directory, read in your data, and it should successfully read in, since the `here()` function forces it to use a relative path to the data from the project's root directory:
+
+```{r}
+#| eval: false
+setwd(here::here())
+pt<-read_csv("data/IBS_data/pt/persson_tabellini_workshop.csv")
+```
+
+Now, when you run the code chunk, it should successfully execute:
+
+```{r}
+#| echo: false
+#| fig-cap: "Code chunk works when using here() to set working directory"
+#| label: fig-plot-24
+knitr::include_graphics('pictures/pic24.png')
+```
+
+After this, the file will also successfully render:
+
+```{r}
+#| echo: false
+#| fig-cap: "Rendering works when using here() to set working directory within code chunk"
+#| label: fig-plot-25
+knitr::include_graphics('pictures/pic25.png')
+```
+
+So, to summarize:
+
+1.  In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into scripts using paths relative to the root directory
+
+2.  However, when working in Quarto documents, Quarto defaults to setting the working directory to the directory in which the **.qmd** file exists, and sets paths relative to this directory.
+
+3.  In order to force Quarto to use the root directory of the R Project as the working directory, we can use the `here()` function. By calling the `here()` function within a code block right before reading in data, you can read in the data using a file path that is defined with respect to the root of the R Project directory, rather one defined with respect to the directory of the **.qmd** file.
 
 # Exercises
 

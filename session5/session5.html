@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -59,8 +93,9 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#writing-the-document" id="toc-writing-the-document" class="nav-link" data-scroll-target="#writing-the-document"><span class="header-section-number">3.2</span> Writing the Document</a></li>
   <li><a href="#rendering-the-document" id="toc-rendering-the-document" class="nav-link" data-scroll-target="#rendering-the-document"><span class="header-section-number">3.3</span> Rendering the Document</a></li>
   </ul></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">4</span> Exercises</a></li>
-  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">5</span> Further Reading</a></li>
+  <li><a href="#r-projects-quarto-and-the-here-package" id="toc-r-projects-quarto-and-the-here-package" class="nav-link" data-scroll-target="#r-projects-quarto-and-the-here-package"><span class="header-section-number">4</span> R Projects, Quarto, and the <em>here()</em> package</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">5</span> Exercises</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">6</span> Further Reading</a></li>
   </ul>
 </nav>
 </div>
@@ -91,6 +126,9 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 </section>
@@ -407,15 +445,135 @@ Figure&nbsp;18: Preview
 <p>Note that after rendering, an html file will also be created in the same directory as your .qmd file, and will update each time you render the .qmd file.</p>
 </section>
 </section>
-<section id="exercises" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Exercises</h1>
+<section id="r-projects-quarto-and-the-here-package" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> R Projects, Quarto, and the <em>here()</em> package</h1>
+<p>R Projects and Quarto are two essential R tools that enable data management, sharing, and communication, both with the scholarly community and the public. Though we’ve introduced these tools separately, it’s likely you’ll want to use them in conjunction (for instance, by placing your Quarto files and rendered documents within your R Projects). Indeed, we’ve already taken a step in this direction above, when we placed our <strong>.qmd</strong> file within our R project.</p>
+<p>As we discussed above, the R Project environment is a self-contained directory, where file paths can be set relative to the project’s root directory (i.e.&nbsp;the highest-level directory within the R project, which contains the <strong>.RProj</strong> file). When working with Quarto, the program automatically sets the root directory for the code that’s executed within the document’s code to the same location as the <strong>.qmd</strong> file. When Quarto files are in an R Project, the working directory set by the location of the Quarto file overrides the working directory set by the R Project. More specifically, if the .qmd file is in the <strong>documents-reports</strong> directory, it will set that as its root directory; as a result, it would be impossible to access the data (in the <strong>raw_data</strong> folder) from the Quarto document using a relative path.</p>
+<p>To make this more concrete, let’s first note the directory structure of the R Project root directory:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plot-20" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-20-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pictures/pic20.png" class="img-fluid figure-img" width="976">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-20-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;19: The R Project Root Directory
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>WIthin the <strong>raw-data</strong> sub-directory, there is another directory called <strong>cc-data</strong>, and within <strong>cc-data</strong>, there is a directory named <strong>pt</strong>, within which the <strong>persson_tabellini_workshop.csv</strong> data that we’ve using resides. Thus, the path to the data runs from the root directory runs as follows:</p>
+<p><strong>raw_data</strong>–&gt;<strong>cc-data</strong>–&gt;<strong>pt</strong>–&gt;<strong>persson_tabellini_workshop.csv</strong></p>
+<p>We can use this file path to read in the Persson-Tabellini data from a script stored in the <strong>scripts</strong> subdirectory. In particular, we could read the data in with the following:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"raw_data/cc-data/pt/persson_tabellini_workshop.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Within our sample R script, it looks like this:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plot-21" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-21-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pictures/pic21.png" class="img-fluid figure-img" width="943">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-21-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20: Reading in data from a script in the script folder
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Now, let’s try to read the data in from within a <strong>.qmd</strong> in the <strong>report-documents</strong> subdirectory:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plot-22" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-22-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pictures/pic22.png" class="img-fluid figure-img" width="943">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-22-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;21: Error when running code chunk to set working directory in Quarto
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Note that trying to run the code chunk throws an error, since the code chunk is interpreting the location of the <strong>.qmd</strong> file (the <strong>report-documents</strong> directory) as the root directory. As a result, the file path doesn’t work; the code chunk is looking for the data in the <strong>reports-documents</strong> directory, but it doesn’t exist there. As expected, attempts to render the document fail for the same reason; when the rendering process hits the code chunk that tries to read in the data, it fails, and the rendering process terminates:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plot-23" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-23-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pictures/pic23.png" class="img-fluid figure-img" width="1447">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-23-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;22: Error when trying to render document as html
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The easiest solution to this problem is to use the <code>here()</code> function from the <em>here</em> package, which automatically finds the root directory of the R Project you’re working in (where the .Rproj file is) and builds paths from there. To see how it works, go ahead and install this package with the following:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"here"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, load the <em>here</em> package at the top of your Quarto document by passing it to the <code>library()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, whenever you need to read in data from your data directory into a <strong>.qmd</strong> file in another (i.e.&nbsp;<strong>report-documents</strong>) directory, simply use the <code>here()</code> function within that code chunk to set the working directory with respect to the project root. After setting the working directory, read in your data, and it should successfully read in, since the <code>here()</code> function forces it to use a relative path to the data from the project’s root directory:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(here<span class="sc">::</span><span class="fu">here</span>())</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pt<span class="ot">&lt;-</span><span class="fu">read_csv</span>(<span class="st">"data/IBS_data/pt/persson_tabellini_workshop.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, when you run the code chunk, it should successfully execute:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plot-24" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-24-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pictures/pic24.png" class="img-fluid figure-img" width="1264">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-24-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;23: Code chunk works when using here() to set working directory
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>After this, the file will also successfully render:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plot-25" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-25-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pictures/pic25.png" class="img-fluid figure-img" width="1426">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-25-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;24: Rendering works when using here() to set working directory within code chunk
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>So, to summarize:</p>
+<ol type="1">
+<li><p>In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into scripts using paths relative to the root directory</p></li>
+<li><p>However, when working in Quarto documents, Quarto defaults to setting the working directory to the directory in which the <strong>.qmd</strong> file exists, and sets paths relative to this directory.</p></li>
+<li><p>In order to force Quarto to use the root directory of the R Project as the working directory, we can use the <code>here()</code> function. By calling the <code>here()</code> function within a code block right before reading in data, you can read in the data using a file path that is defined with respect to the root of the R Project directory, rather one defined with respect to the directory of the <strong>.qmd</strong> file.</p></li>
+</ol>
+</section>
+<section id="exercises" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Exercises</h1>
 <p><em>Question 1</em></p>
 <p>Create a new R Project that will serve as a “practice” workspace for you to continue practicing your R skills going forward, with the directory structure recommended earlier. In the Project, you may wish to add the scripts and data from our workshops. Check to make sure your scripts use relative paths with respect to the root project directory, and are able to run successfully. As you continue to practice R, you can add new scripts and data to this R Project, and keep all of your practice and skill-development work in one place.</p>
 <p><em>Question 2</em></p>
 <p>Create a new Quarto document, and use it to present the relevant code and output from previous practice exercises. Make sure to comment your code. Render the completed file as an html document.</p>
 </section>
-<section id="further-reading" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Further Reading</h1>
+<section id="further-reading" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Further Reading</h1>
 <p>For more on Quarto, please see this <a href="https://quarto-tdg.org">guide</a>. More generally, if you wish to continue learning R, the best resource is the online book <a href="https://r4ds.hadley.nz">R for Data Science</a>. Please reach out to me if there are particular things you’d like to learn, and are looking for more tailored resources.</p>
 </section>
 
