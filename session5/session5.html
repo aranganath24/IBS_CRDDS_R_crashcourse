@@ -487,7 +487,7 @@ Figure&nbsp;20: Reading in data from a script in the script folder
 </div>
 </div>
 </div>
-<p>Now, let’s try to read the data in from within a <strong>.qmd</strong> in the <strong>report-documents</strong> subdirectory:</p>
+<p>Now, let’s try to read the data in from within a <strong>.qmd</strong> file in the <strong>report-documents</strong> subdirectory:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-plot-22" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -517,7 +517,7 @@ Figure&nbsp;22: Error when trying to render document as html
 </div>
 </div>
 </div>
-<p>The easiest solution to this problem is to use the <code>here()</code> function from the <em>here</em> package, which automatically finds the root directory of the R Project you’re working in (where the .Rproj file is) and builds paths from there. To see how it works, go ahead and install this package with the following:</p>
+<p>The easiest solution to this problem is to use the <code>here()</code> function from the <em>here</em> package, which automatically finds the root directory of the R Project you’re working in (remember that the root directory of your R project is the directory in which the <code>.Rproj</code> file is located) and builds paths from there. To see how it works, go ahead and install this package with the following:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"here"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -525,7 +525,7 @@ Figure&nbsp;22: Error when trying to render document as html
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Then, whenever you need to read in data from your data directory into a <strong>.qmd</strong> file in another (i.e.&nbsp;<strong>report-documents</strong>) directory, simply use the <code>here()</code> function within that code chunk to set the working directory with respect to the project root. After setting the working directory, read in your data, and it should successfully read in, since the <code>here()</code> function forces it to use a relative path to the data from the project’s root directory:</p>
+<p>Then, whenever you need to read in data from your <strong>raw_data</strong> directory into a <strong>.qmd</strong> file in another (i.e.&nbsp;<strong>report-documents</strong>) directory, simply use the <code>here()</code> function within that code chunk to set the working directory as the Project’s root directory. After setting the working directory as the root directory, go ahead and read in your data as you would in a script (i.e.&nbsp;using a path defined relative to the root directory), and it should successfully read in. In short, the <code>here()</code> function overrides the default behavior within Quarto documents to set the working directory as the directory with the <strong>.qmd</strong> file, and forces these documents to follow the default behavior of R Project files and use the root directory of the R Project as the working directory which file paths are defined in relation to. Let’s see how it works:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(here<span class="sc">::</span><span class="fu">here</span>())</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pt<span class="ot">&lt;-</span><span class="fu">read_csv</span>(<span class="st">"raw_data/cc-data/pt/persson_tabellini_workshop.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -536,7 +536,7 @@ Figure&nbsp;22: Error when trying to render document as html
 <div id="fig-plot-24" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-plot-24-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="pictures/pic24.png" class="img-fluid figure-img" width="1264">
+<img src="pictures/pic-24-alt-alt.png" class="img-fluid figure-img" width="1408">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-24-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;23: Code chunk works when using here() to set working directory
@@ -562,7 +562,7 @@ Figure&nbsp;24: Rendering works when using here() to set working directory withi
 </div>
 <p>So, to summarize:</p>
 <ol type="1">
-<li><p>In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into the R environment in scripts that use file paths relative to the root directory</p></li>
+<li><p>In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into the R environment in scripts that use file paths that are defined relative to the root directory</p></li>
 <li><p>However, when working in Quarto documents, Quarto defaults to setting the working directory to the directory in which the <strong>.qmd</strong> file exists, and sets paths relative to this directory.</p></li>
 <li><p>In order to force Quarto to use the root directory of the R Project as the working directory, we can use the <code>here()</code> function. By calling the <code>here()</code> function within a code block right before reading in data, and using it to set your working directory, you can read in the data using a file path that is defined with respect to the root of the R Project directory, rather one that is defined with respect to the directory in which the <strong>.qmd</strong> file is located.</p></li>
 </ol>
@@ -572,7 +572,7 @@ Figure&nbsp;24: Rendering works when using here() to set working directory withi
 <p><em>Question 1</em></p>
 <p>Create a new R Project that will serve as a “practice” workspace for you to continue practicing your R skills going forward, with the directory structure recommended earlier. In the Project, you may wish to add the scripts and data from our workshops. Check to make sure your scripts use relative paths with respect to the root project directory, and are able to run successfully. As you continue to practice R, you can add new scripts and data to this R Project, and keep all of your practice and skill-development work in one place.</p>
 <p><em>Question 2</em></p>
-<p>Create a new Quarto document, and use it to present the relevant code and output from previous practice exercises. Make sure to comment your code. Render the completed file as an html document.</p>
+<p>Create a new Quarto document, and use it to present the relevant code and output from previous practice exercises. Make sure to comment your code, and render the completed file as an html document.</p>
 </section>
 <section id="further-reading" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Further Reading</h1>

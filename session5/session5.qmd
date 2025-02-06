@@ -278,7 +278,7 @@ Within our sample R script, it looks like this:
 knitr::include_graphics('pictures/pic21.png')
 ```
 
-Now, let's try to read the data in from within a **.qmd** in the **report-documents** subdirectory:
+Now, let's try to read the data in from within a **.qmd** file in the **report-documents** subdirectory:
 
 ```{r}
 #| echo: false
@@ -296,7 +296,7 @@ Note that trying to run the code chunk throws an error, since the code chunk is 
 knitr::include_graphics('pictures/pic-23-alt.png')
 ```
 
-The easiest solution to this problem is to use the `here()` function from the *here* package, which automatically finds the root directory of the R Project you're working in (where the .Rproj file is) and builds paths from there. To see how it works, go ahead and install this package with the following:
+The easiest solution to this problem is to use the `here()` function from the *here* package, which automatically finds the root directory of the R Project you're working in (remember that the root directory of your R project is the directory in which the `.Rproj` file is located) and builds paths from there. To see how it works, go ahead and install this package with the following:
 
 ```{r}
 #| eval: false
@@ -312,7 +312,7 @@ library(here)
 
 ```
 
-Then, whenever you need to read in data from your data directory into a **.qmd** file in another (i.e. **report-documents**) directory, simply use the `here()` function within that code chunk to set the working directory with respect to the project root. After setting the working directory, read in your data, and it should successfully read in, since the `here()` function forces it to use a relative path to the data from the project's root directory:
+Then, whenever you need to read in data from your **raw_data** directory into a **.qmd** file in another (i.e. **report-documents**) directory, simply use the `here()` function within that code chunk to set the working directory as the Project's root directory. After setting the working directory as the root directory, go ahead and read in your data as you would in a script (i.e. using a path defined relative to the root directory), and it should successfully read in. In short, the `here()` function overrides the default behavior within Quarto documents to set the working directory as the directory with the **.qmd** file, and forces these documents to follow the default behavior of R Project files and use the root directory of the R Project as the working directory which file paths are defined in relation to. Let's see how it works:
 
 ```{r}
 #| eval: false
@@ -326,7 +326,7 @@ Now, when you run the code chunk, it should successfully execute:
 #| echo: false
 #| fig-cap: "Code chunk works when using here() to set working directory"
 #| label: fig-plot-24
-knitr::include_graphics('pictures/pic24.png')
+knitr::include_graphics('pictures/pic-24-alt-alt.png')
 ```
 
 After this, the file will also successfully render:
@@ -340,7 +340,7 @@ knitr::include_graphics('pictures/pic25.png')
 
 So, to summarize:
 
-1.  In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into the R environment in scripts that use file paths relative to the root directory
+1.  In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into the R environment in scripts that use file paths that are defined relative to the root directory
 
 2.  However, when working in Quarto documents, Quarto defaults to setting the working directory to the directory in which the **.qmd** file exists, and sets paths relative to this directory.
 
@@ -354,7 +354,7 @@ Create a new R Project that will serve as a "practice" workspace for you to cont
 
 *Question 2*
 
-Create a new Quarto document, and use it to present the relevant code and output from previous practice exercises. Make sure to comment your code. Render the completed file as an html document.
+Create a new Quarto document, and use it to present the relevant code and output from previous practice exercises. Make sure to comment your code, and render the completed file as an html document.
 
 # Further Reading
 
