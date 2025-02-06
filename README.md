@@ -1,1 +1,1 @@
-This repository contains materials associated with a 5-day workshop series hosted by the Center for Research Data and Digital Scholarship and the Institute for Behavioral Studies at the University of  Colorado Boulder. 
+This repository contains materials associated with a 5-day workshop series hosted by the Center for Research Data and Digital Scholarship and the Institute for Behavioral Studies at the University of Colorado Boulder. 
