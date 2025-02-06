@@ -1,4 +1,4 @@
-This repository contains materials associated with a 5-day workshop series hosted by the [Center for Research Data and Digital Scholarship](https://www.colorado.edu/crdds/) and the [Institute for Behavioral Science](https://ibs.colorado.edu) at the University of Colorado Boulder, 
+This repository contains materials associated with a 5-day workshop series entitled "A Crash Course in R for Social Scientists". The workshop series was hosted by the [Center for Research Data and Digital Scholarship](https://www.colorado.edu/crdds/) and the [Institute for Behavioral Science](https://ibs.colorado.edu) at the University of Colorado Boulder, 
 during the week of 1/27/2025. 
 
 The individual lesson plans can be accessed through the following links:
