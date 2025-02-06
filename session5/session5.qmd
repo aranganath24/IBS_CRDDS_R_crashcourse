@@ -22,34 +22,38 @@ library(tidyverse)
 
 # Introduction
 
+In this lesson, we'll learn about some tools that can help you write reproducible R code and manage your projects, as well as communicate your results with others (whether collaborators, students, the broader scholarly community, or the public) in a transparent and compelling way. In particular, we will introduce R Studio's *Projects* feature, which provides a useful container for the various components of an R project (i.e. raw data, analysis outputs and processed data, scripts etc) and helps keep these components organized and easy to share. We will also introduce *Quarto*, an open-source publishing system that enables you to produce articles, websites, slides, books, and other documents. The *Quarto* ecosystem is too vast for us to comprehensively explore here, so our focus will be on using *Quarto* as a platform for literate programming, which refers to the practice of writing code as human readable scripts that integrate narrative text, code, and code outputs into a single cohesive and accessible document.
+
 # R Projects
 
-As you move forward in using R, the scope and complexity of your work will increase, which makes
+As you move forward in using R, the scope and complexity of your work will increase, which means that it will become increasingly important (and challenging) to systematically track the various components of your projects, and to share your projects with others. R Studio's *Project* functionality can make these data and project management tasks more tractable and streamlined, which in turn facilitates the reproducibility of your work.
 
 ## What is an R Project?
 
-R Studio's "Project" feature has the potential to make your data management in R easier and more streamlined; it can also, in turn, make your work more reproducible and easier to share with others. An R Studio Project, quite simply, is a folder/directory in which you can store all of the materials associated with an R-based project, such as your raw data, your scripts, outputs (i.e. visualizations, processed data etc.), and reports. Project directories in R Studio come with a `.Rproj` file that establishes a self-contained workspace for your project. This R Project workspace has several useful features.
-
-## What are the benefits of using R Projects?
-
-First, there is a standardized working directory. When you create an R project, and subsequently work in it, R automatically sets the working directory to the root folder of the project, ensuring that relative paths work consistently and reliably regardless of where in the folder your scripts or files are located. In other words, this feature allows you to not worry about managing file directories; everything in the project file can be referenced in your script with respect to the root folder of the project (i.e. the project's top-level directory that contains all of the projects, scripts, data, and subdirectories). If you are ever confused about the root folder of the project, it is the one where the .Rproj file is located. Let's say, for example, that your project directory looks like this:
+An R Studio Project, quite simply, is a folder/directory in which you can store all of the materials associated with an R-based project, such as your raw data, your scripts, outputs (i.e. visualizations, processed data etc.), and reports. For each of these project components, you should create dedicated sub-directories within the main R Project directory, so your R Project directory should look something like this:
 
 ```{r}
 #| echo: false
 #| fig-cap: "R Project Directory"
 #| label: fig-plot-1
-knitr::include_graphics('pictures/pic1.png')
+knitr::include_graphics('pictures/pic1_alt.png')
 ```
 
-First, note the **.Rproj** file within the directory, which indicates that this directory (**r-crash-course-example**) is the root directory of an R project. Let's say, for the sake of argument, that you are storing your scripts in the **scripts** sub-directory, and your raw data in the **data** sub-directory. Because the working directory is standardized to be the root directory of the project, we can refer to data living in the **data** folder within a script in the **scripts** directory using a relative path that originates from the project's root directory. So, for example, assuming the **data** folder contains two subdirectories, **pt** (which contains `persson_tabellini_workshop.csv`) and **wb**, we could read in the Persson-Tabellini data with `read_csv("data/pt/persson_tabellini_workshop.csv`. If this wasn't an R Project directory, this would not be possible.
+Note the `.Rproj` file within the directory. It is this file that defines a directory as an R Project directory that functions as a self-contained workspace for a given project. File paths within an R Project can be defined in relative terms with respect to this main project directory (i.e. the directory which has the `.Rproj` file, a point we'll return to below.
 
-The standardization of the working directory makes project management more convenient, and also enables sharing. For example, if you needed to share your work with a collaborator, you could zip up the R project directory and send it to them. When they run your scripts, everything should work as they did on your own computer even though their directory structure is different, since all the file paths are defined in relative terms with respect to the root of the project directory. In addition, GitHub recognizes **.RProj** files, which allows you to push an R project directory and its components to GitHub. When a collaborator clones the repository to their local machine, they will be able to run your scripts (since it's set to the project root and all file paths are relative to it), add to your scripts, and push it the changes back up to GitHub. When you update your local repository, everything should continue to work seamlessly.
+## What are the benefits of using R Projects?
+
+One of the primary benefits of an R Project is that it creates a standard working directory. When you create an R project, and subsequently use it as a container for your project files, R automatically sets the working directory to the root folder of the project, ensuring that relative paths work consistently and reliably regardless of where in the folder your scripts or files are located. In other words, this feature allows you to not worry about managing file directories; everything in the project file can be referenced in your script with respect to the root directory of the project (i.e. the project's top-level directory that contains the `.Rproj` file). Let's say, for example, that your project directory looks like the one above, in Figure 1.
+
+First, note the **.Rproj** file within the directory, which indicates that this directory (**r-crash-course-class-example**) is the root directory of an R project. Let's say, for the sake of argument, that you are storing your scripts in the **scripts** sub-directory, and your raw data in the **raw_data** sub-directory. Because the working directory is standardized to be the root directory of the project, we can refer to data living in the **data** folder within a script in the **scripts** sub-directory using a relative path that originates from the project's root directory. So, for example, assuming the **raw_data** folder contains two subdirectories, **pt** (which contains `persson_tabellini_workshop.csv`) and **wb**, we could read in the Persson-Tabellini data with `read_csv("raw_data/pt/persson_tabellini_workshop.csv`. If we weren't working within an R Project environment, this would not be possible.
+
+The standardization of the working directory makes project management more convenient, and also enables sharing. For example, if you needed to share your work with a collaborator, you could zip up the R Project directory and send it to them. When they run your scripts, everything should work as they did on your own computer even though their directory structure is different, since all the file paths are defined in relative terms with respect to the root of the project directory. In addition, GitHub recognizes **.RProj** files, which allows you to push an R project directory and its components to GitHub. When a collaborator clones the repository to their local machine, they will be able to run your scripts (since it's set to the project root and all file paths are relative to it), add to your scripts, and push the changes back up to GitHub. When you update your local repository, everything should continue to work seamlessly.
 
 Second, each R Project is self-contained, which means that variables and objects in one project do not interfere with another. In addition, you can have multiple RStudio windows open for different projects, and they won't share variables or loaded packages, which is helpful if you're working on multiple research projects at a time.
 
 Third, each project can have its own set of package versions, which prevents conflicts between projects that require different package versions. More generally, R Projects allow for a lot of customization that defines R's behavior for that specific project, without generalizing to other projects and R-related files.
 
-Finally, working within a project allows for more effective and organized file management. Instead of dispersing relevant files and directories across your computer, which makes it difficult to keep track of everything, a project allows us to create directories for scripts, data, results, and documents and reports that are centrally located and easy to find.
+Finally, working within a project allows for more effective and organized file management. Instead of dispersing relevant files and directories across your computer, which makes it difficult to keep track of everything, a project allows us to create sub-directories for scripts, data, results, and documents and reports that are centrally located and easy to find.
 
 In short, R Projects offer meaningful benefits in the realm of project and data management, and facilitate sharing, collaboration, and reproducibility.
 
@@ -83,7 +87,7 @@ You will then specify the location of the new R Project on your computer's direc
 #| echo: false
 #| fig-cap: "Specify directory location"
 #| label: fig-plot-5
-knitr::include_graphics('pictures/pic5.png')
+knitr::include_graphics('pictures/pic5-alt.png')
 ```
 
 At this point, your project will be created (to confirm this, go to your project directory and confirm the existence of the **.RProj** file. You should configure your project directory something like in @fig-plot-1 , with sub-directories for your raw or unprocessed data, scripts, R outputs (like processed data and visualizations), and reports and documents. This will help you keep track of a project's many moving parts, and stay organized.
@@ -108,13 +112,13 @@ This will bring you to a menu interface that looks like the following:
 knitr::include_graphics('pictures/pic7.png')
 ```
 
-You can explore the various options, but it's generally recommended to set all of the workspace options to "No", especially if you are working on a research project that will ultimately be shared and published. **.RData** is a binary file that R uses to save your workspace (which includes all of the R object you create) across multiple sessions. Hadley Wickham, a leading R developer (particularly on the *tidyverse* suite we've been using extensively the past few days), recommends avoiding .RData, and saving all of your work in reproducible scripts that can precisely regenerate all of your work. Using scripts, rather than .RData, to keep track of your objects and work (and regenerate them as necessary) will make your work more reproducible, since it reduces the likelihood that you unknowingly carry over old objects into new work and create hidden dependencies in your code ( by relying on objects from a previous session that were not explicitly created in your current script). In addition, carrying over the workspace session to session may end up leading to a cluttered environment, with a lot of superfluous objects you can't keep track of. In short, rely on well-documented scripts, rather than **.RData** to track your work and restore your environment after closing a session; using **.RData** to save your workspace could be more convenient in the short run, but will likely be more painful in the long run.
+You can explore the various options, but it's generally recommended to set all of the workspace options to "No", especially if you are working on a research project that will ultimately be shared and published. **.RData** is a binary file that R uses to save your workspace (which includes all of the R objects you create) across multiple sessions. Hadley Wickham, a leading R developer (particularly on the *tidyverse* suite we've been using extensively the past few days), recommends avoiding .RData, and saving all of your work in reproducible scripts that can precisely regenerate all of your work. Using scripts, rather than .RData, to keep track of your objects and work (and regenerate them as necessary) will make your work more reproducible, since it reduces the likelihood that you unknowingly carry over old objects into new work and create hidden dependencies in your code ( by relying on objects from a previous session that were not explicitly created in your current script). In addition, carrying over the workspace session to session may end up leading to a cluttered environment, with a lot of superfluous objects you can't keep track of. In short, you will generally be best-served by relying on well-documented scripts, rather than **.RData** to track your work and restore your environment after closing a session; using **.RData** to save your workspace could be more convenient in the short run, but will likely be more painful in the long run.
 
 # Quarto
 
 Quarto is an open source publishing system that allows us to create a variety of outputs (such as reports, presentations, websites, and dashboards) that facilitate research related communications with a variety of audiences, including colleagues, collaborators and co-authors, students, and the public. It is compatible with a variety of programming languages, including R.
 
-One of the many benefits of Quarto is that it enables *literate programming*, a concept developed by the computer scientist. Literate programming is a practice in which the authors of code embed their code in human-readable documents that also contain narrative exposition of the code, and the actual outputs of the code, so that others can clearly understanding how the different parts of an analysis fit together. Among other things, literate programming facilitates transparency and clarity when communicating about the scripts used to generate research results. The lesson plans we've used in this workshop work within the literate programming paradigm, to the extent that it combines narrative text, blocks of code, and code outputs into an integrated document. While the lesson plans in this course
+One of the many benefits of Quarto is that it enables *literate programming*, a concept developed by the computer scientist Donald Knuth. Literate programming is a practice in which the authors of code embed their code in human-readable documents that also contain narrative exposition of the code, and the actual outputs of the code, so that others can clearly understanding how the different parts of an analysis fit together. Among other things, literate programming facilitates transparency and clarity when communicating about the scripts used to generate research results. The lesson plans we've used in this workshop work within the literate programming paradigm, to the extent that it combines narrative text, blocks of code, and code outputs into an integrated document. Below, we'll learn how to create simple literate programming documents using Quarto.
 
 ## Making a New Quarto Document
 
@@ -149,7 +153,7 @@ The document comes prepopulated with some text that can serve as a useful guide 
 
 ## Writing the Document
 
-A Quarto document is comprised of three main elements. First, there is the YAML header, which contains metadata for the entire document, and allows us to define document settings and set rules for how it will behave. Among many other things, you can use the YAML header to specify the desired output type (i.e. html, pdf, word), and define a table of contents. For example, see the YAML header associated for the first lesson plan we worked through on the first day of the workshop:
+A Quarto document is comprised of three main elements. First, there is the YAML header, which contains metadata for the entire document, and allows us to define document settings and set rules for how the document will behave. Among many other things, we can use the YAML header to specify the desired output type (i.e. html, pdf, word), and define a table of contents. For example, see the YAML header associated for the first lesson plan we worked through on the first day of the workshop:
 
 ```{r}
 #| echo: false
@@ -158,9 +162,9 @@ A Quarto document is comprised of three main elements. First, there is the YAML 
 knitr::include_graphics('pictures/pic11.png')
 ```
 
-Note that this is a pretty simple YAML header; as documents become more complex, these headers will tend to become more complex.
+Note that this is a pretty simple YAML header; as documents become more complex, and need to be customized, these headers will also become correspondingly more complex.
 
-Second, there is document text, which is formatted in the Markdown language. Markdown is extremely simple, and if you are not familiar with it, can quickly get started by consulting this [guide](https://www.markdownguide.org/basic-syntax/). You also have the option of formatting your text using the toolbar; from there, you can do all of the things you could also do with Markdown, such as add headers, add bullet points, format your text, add hyperlinks, and add images (among other things):
+Second, there is document text, which is formatted in the Markdown language. Markdown is extremely simple, and if you are not familiar with it, can quickly get started by consulting this [guide](https://www.markdownguide.org/basic-syntax/). You also have the option of formatting your text using the Quarto toolbar; from there, you can do all of the things you could also do with Markdown, such as add headers, add bullet points, format your text, add hyperlinks, and add images (among other things):
 
 ```{r}
 #| echo: false
@@ -169,7 +173,7 @@ Second, there is document text, which is formatted in the Markdown language. Mar
 knitr::include_graphics('pictures/pic12.png')
 ```
 
-Finally, the third main components of a Quarto file are "code chunks", where you can create blocks of code which generate outputs embedded in the document. To create a code chunk you can go to to **Code** in the R Studio Menu bar up top, then click **Insert Chunk**. A perhaps easier way is to click the green "C" button in the Quarto menu:
+Finally, the third main components of a Quarto file are "code chunks", where you can create blocks of code which generate outputs embedded in the document. You can also comment the code added within these blocks, just as you would comment code in a script. To create a code chunk you can go to to **Code** in the R Studio Menu bar up top, then click **Insert Chunk**. Another waym perhaps easier, is to click the green "C" button in the Quarto menu:
 
 ```{r}
 #| echo: false
@@ -196,7 +200,7 @@ After you click the "Run" button, the, code will run and the result will print i
 knitr::include_graphics('pictures/pic15.png')
 ```
 
-There are various ways to customize your code blocks and specify their behavior. For example, you can hide code blocks so that only the output is shown; you can also create code blocks that don't execute, so that the final report shows the code block without the output; you can suppress code warnings; and so on. For more information on the relevant syntax, see this [guide to Quarto](https://quarto.org/docs/computations/execution-options.html).
+There are various ways to customize your code blocks and specify their behavior. For example, you can hide code blocks so that only the output is shown; you can also create code blocks that don't execute, so that the final report shows the code block without the output; you can suppress code warnings; and so on. For more information on the relevant syntax needed to customize code chunks in these (and other) ways, see this [guide to Quarto](https://quarto.org/docs/computations/execution-options.html).
 
 ## Rendering the Document
 
@@ -218,7 +222,7 @@ Now, let's go ahead and save this .qmd file to the **documents-reports** directo
 knitr::include_graphics('pictures/pic17.png')
 ```
 
-The rendered document should appear in either a separate window, or in your R Studio Viewer pane. You can choose where the document renders by clicking the small arrow next to the **Render** button, and clicking either **Preview in Window** or **Preview in Viewer Pane**:
+The rendered document should appear in either a separate window, or in your R Studio Viewer pane. You can choose where the document renders by clicking the small downward-pointing arrow next to the **Render** button, and clicking either **Preview in Window** or **Preview in Viewer Pane**:
 
 ```{r}
 #| echo: false
@@ -227,7 +231,7 @@ The rendered document should appear in either a separate window, or in your R St
 knitr::include_graphics('pictures/pic18.png')
 ```
 
-If you choose to preview in the viewer pane, it'll look something like what you see below. Note the HTML preview on the right. This is a nice way of keeping track of what the rendered document looks like as you work:
+If you choose to preview in the viewer pane, it'll look something like what you see below. Note the HTML preview on the right. This is a nice way of keeping track of what the rendered document looks like as you write your document within the **.qmd** file:
 
 ```{r}
 #| echo: false
@@ -236,13 +240,13 @@ If you choose to preview in the viewer pane, it'll look something like what you 
 knitr::include_graphics('pictures/pic19.png')
 ```
 
-Note that after rendering, an html file will also be created in the same directory as your .qmd file, and will update each time you render the .qmd file.
+Note that after rendering, an html file will also be created in the same directory as your .qmd file, and will update each time you render the .qmd file by clicking the **Render** button.
 
 # R Projects, Quarto, and the *here()* package
 
-R Projects and Quarto are two essential R tools that enable data management, sharing, and communication, both with the scholarly community and the public. Though we've introduced these tools separately, it's likely you'll want to use them in conjunction (for instance, by placing your Quarto files and rendered documents within your R Projects). Indeed, we've already taken a step in this direction above, when we placed our **.qmd** file within our R project.
+R Projects and Quarto are two essential R tools that enable data management, sharing, and communication, both with the scholarly community and the public. Though we've introduced these tools separately, it's likely you'll want to use them in conjunction (for instance, by placing your Quarto files and rendered documents within the **reports-documents** subdirectory of your R Project directory). Indeed, we've already taken a step in this direction above, when we placed our **.qmd** file within the **reports-documents** subdirectory of our R Project directory.
 
-As we discussed above, the R Project environment is a self-contained directory, where file paths can be set relative to the project's root directory (i.e. the highest-level directory within the R project, which contains the **.RProj** file). When working with Quarto, the program automatically sets the root directory for the code that's executed within the document's code to the same location as the **.qmd** file. When Quarto files are in an R Project, the working directory set by the location of the Quarto file overrides the working directory set by the R Project. More specifically, if the .qmd file is in the **documents-reports** directory, it will set that as its root directory; as a result, it would be impossible to access the data (in the **raw_data** folder) from the Quarto document using a relative path.
+As we discussed above, the R Project environment is a self-contained directory, where file paths can be set relative to the project's root directory (i.e. the highest-level directory within the R project, which contains the **.RProj** file). When working with Quarto, the program automatically sets the root directory for the code that's executed within the document to the same location as the **.qmd** file. When Quarto files are in an R Project, the working directory set by the location of the Quarto file overrides the working directory set by the R Project. More specifically, if the .qmd file is in the **documents-reports** directory (as it is here), it will set that as its root directory; as a result, it would be impossible to access the data (in the **raw_data** folder) from the Quarto document using a relative path.
 
 To make this more concrete, let's first note the directory structure of the R Project root directory:
 
@@ -253,7 +257,7 @@ To make this more concrete, let's first note the directory structure of the R Pr
 knitr::include_graphics('pictures/pic20.png')
 ```
 
-WIthin the **raw-data** sub-directory, there is another directory called **cc-data**, and within **cc-data**, there is a directory named **pt**, within which the **persson_tabellini_workshop.csv** data that we've using resides. Thus, the path to the data runs from the root directory runs as follows:
+WIthin the **raw-data** sub-directory, there is another directory called **cc-data**, and within **cc-data**, there is a directory named **pt**, within which the **persson_tabellini_workshop.csv** data that we've been using resides. Thus, the path to the data from the Project's root directory runs as follows:
 
 **raw_data**–\>**cc-data**–\>**pt**–\>**persson_tabellini_workshop.csv**
 
@@ -289,7 +293,7 @@ Note that trying to run the code chunk throws an error, since the code chunk is 
 #| echo: false
 #| fig-cap: "Error when trying to render document as html"
 #| label: fig-plot-23
-knitr::include_graphics('pictures/pic23.png')
+knitr::include_graphics('pictures/pic-23-alt.png')
 ```
 
 The easiest solution to this problem is to use the `here()` function from the *here* package, which automatically finds the root directory of the R Project you're working in (where the .Rproj file is) and builds paths from there. To see how it works, go ahead and install this package with the following:
@@ -313,7 +317,7 @@ Then, whenever you need to read in data from your data directory into a **.qmd**
 ```{r}
 #| eval: false
 setwd(here::here())
-pt<-read_csv("data/IBS_data/pt/persson_tabellini_workshop.csv")
+pt<-read_csv("raw_data/cc-data/pt/persson_tabellini_workshop.csv")
 ```
 
 Now, when you run the code chunk, it should successfully execute:
@@ -336,11 +340,11 @@ knitr::include_graphics('pictures/pic25.png')
 
 So, to summarize:
 
-1.  In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into scripts using paths relative to the root directory
+1.  In an R Project, the working directory is automatically set to the root of the R Project directory, and files can be read into the R environment in scripts that use file paths relative to the root directory
 
 2.  However, when working in Quarto documents, Quarto defaults to setting the working directory to the directory in which the **.qmd** file exists, and sets paths relative to this directory.
 
-3.  In order to force Quarto to use the root directory of the R Project as the working directory, we can use the `here()` function. By calling the `here()` function within a code block right before reading in data, you can read in the data using a file path that is defined with respect to the root of the R Project directory, rather one defined with respect to the directory of the **.qmd** file.
+3.  In order to force Quarto to use the root directory of the R Project as the working directory, we can use the `here()` function. By calling the `here()` function within a code block right before reading in data, and using it to set your working directory, you can read in the data using a file path that is defined with respect to the root of the R Project directory, rather one that is defined with respect to the directory in which the **.qmd** file is located.
 
 # Exercises
 
