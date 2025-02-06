@@ -11,11 +11,15 @@ format:
 editor: visual
 ---
 
+# Preliminaries
+
+Please load the *tidyverse*. Below, we'll also eventually install and load a library called *here*, but it is not necessary to do so at the outset.
+
 ```{r}
 #| message: false
 #| warning: false
 #| echo: true
-
+# load library
 library(tidyverse)
 
 ```

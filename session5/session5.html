@@ -80,22 +80,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
-  <li><a href="#r-projects" id="toc-r-projects" class="nav-link" data-scroll-target="#r-projects"><span class="header-section-number">2</span> R Projects</a>
+  <li><a href="#preliminaries" id="toc-preliminaries" class="nav-link active" data-scroll-target="#preliminaries"><span class="header-section-number">1</span> Preliminaries</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">2</span> Introduction</a></li>
+  <li><a href="#r-projects" id="toc-r-projects" class="nav-link" data-scroll-target="#r-projects"><span class="header-section-number">3</span> R Projects</a>
   <ul class="collapse">
-  <li><a href="#what-is-an-r-project" id="toc-what-is-an-r-project" class="nav-link" data-scroll-target="#what-is-an-r-project"><span class="header-section-number">2.1</span> What is an R Project?</a></li>
-  <li><a href="#what-are-the-benefits-of-using-r-projects" id="toc-what-are-the-benefits-of-using-r-projects" class="nav-link" data-scroll-target="#what-are-the-benefits-of-using-r-projects"><span class="header-section-number">2.2</span> What are the benefits of using R Projects?</a></li>
-  <li><a href="#how-do-you-initiate-an-r-project" id="toc-how-do-you-initiate-an-r-project" class="nav-link" data-scroll-target="#how-do-you-initiate-an-r-project"><span class="header-section-number">2.3</span> How do you initiate an R Project?</a></li>
+  <li><a href="#what-is-an-r-project" id="toc-what-is-an-r-project" class="nav-link" data-scroll-target="#what-is-an-r-project"><span class="header-section-number">3.1</span> What is an R Project?</a></li>
+  <li><a href="#what-are-the-benefits-of-using-r-projects" id="toc-what-are-the-benefits-of-using-r-projects" class="nav-link" data-scroll-target="#what-are-the-benefits-of-using-r-projects"><span class="header-section-number">3.2</span> What are the benefits of using R Projects?</a></li>
+  <li><a href="#how-do-you-initiate-an-r-project" id="toc-how-do-you-initiate-an-r-project" class="nav-link" data-scroll-target="#how-do-you-initiate-an-r-project"><span class="header-section-number">3.3</span> How do you initiate an R Project?</a></li>
   </ul></li>
-  <li><a href="#quarto" id="toc-quarto" class="nav-link" data-scroll-target="#quarto"><span class="header-section-number">3</span> Quarto</a>
+  <li><a href="#quarto" id="toc-quarto" class="nav-link" data-scroll-target="#quarto"><span class="header-section-number">4</span> Quarto</a>
   <ul class="collapse">
-  <li><a href="#making-a-new-quarto-document" id="toc-making-a-new-quarto-document" class="nav-link" data-scroll-target="#making-a-new-quarto-document"><span class="header-section-number">3.1</span> Making a New Quarto Document</a></li>
-  <li><a href="#writing-the-document" id="toc-writing-the-document" class="nav-link" data-scroll-target="#writing-the-document"><span class="header-section-number">3.2</span> Writing the Document</a></li>
-  <li><a href="#rendering-the-document" id="toc-rendering-the-document" class="nav-link" data-scroll-target="#rendering-the-document"><span class="header-section-number">3.3</span> Rendering the Document</a></li>
+  <li><a href="#making-a-new-quarto-document" id="toc-making-a-new-quarto-document" class="nav-link" data-scroll-target="#making-a-new-quarto-document"><span class="header-section-number">4.1</span> Making a New Quarto Document</a></li>
+  <li><a href="#writing-the-document" id="toc-writing-the-document" class="nav-link" data-scroll-target="#writing-the-document"><span class="header-section-number">4.2</span> Writing the Document</a></li>
+  <li><a href="#rendering-the-document" id="toc-rendering-the-document" class="nav-link" data-scroll-target="#rendering-the-document"><span class="header-section-number">4.3</span> Rendering the Document</a></li>
   </ul></li>
-  <li><a href="#r-projects-quarto-and-the-here-package" id="toc-r-projects-quarto-and-the-here-package" class="nav-link" data-scroll-target="#r-projects-quarto-and-the-here-package"><span class="header-section-number">4</span> R Projects, Quarto, and the <em>here()</em> package</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">5</span> Exercises</a></li>
-  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">6</span> Further Reading</a></li>
+  <li><a href="#r-projects-quarto-and-the-here-package" id="toc-r-projects-quarto-and-the-here-package" class="nav-link" data-scroll-target="#r-projects-quarto-and-the-here-package"><span class="header-section-number">5</span> R Projects, Quarto, and the <em>here()</em> package</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">6</span> Exercises</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">7</span> Further Reading</a></li>
   </ul>
 </nav>
 </div>
@@ -126,18 +127,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="preliminaries" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Preliminaries</h1>
+<p>Please load the <em>tidyverse</em>. Below, we’ll also eventually install and load a library called <em>here</em>, but it is not necessary to do so at the outset.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load library</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="introduction" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+</section>
+<section id="introduction" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Introduction</h1>
 <p>In this lesson, we’ll learn about some tools that can help you write reproducible R code and manage your projects, as well as communicate your results with others (whether collaborators, students, the broader scholarly community, or the public) in a transparent and compelling way. In particular, we will introduce R Studio’s <em>Projects</em> feature, which provides a useful container for the various components of an R project (i.e.&nbsp;raw data, analysis outputs and processed data, scripts etc) and helps keep these components organized and easy to share. We will also introduce <em>Quarto</em>, an open-source publishing system that enables you to produce articles, websites, slides, books, and other documents. The <em>Quarto</em> ecosystem is too vast for us to comprehensively explore here, so our focus will be on using <em>Quarto</em> as a platform for literate programming, which refers to the practice of writing code as human readable scripts that integrate narrative text, code, and code outputs into a single cohesive and accessible document.</p>
 </section>
-<section id="r-projects" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> R Projects</h1>
+<section id="r-projects" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> R Projects</h1>
 <p>As you move forward in using R, the scope and complexity of your work will increase, which means that it will become increasingly important (and challenging) to systematically track the various components of your projects, and to share your projects with others. R Studio’s <em>Project</em> functionality can make these data and project management tasks more tractable and streamlined, which in turn facilitates the reproducibility of your work.</p>
-<section id="what-is-an-r-project" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="what-is-an-r-project"><span class="header-section-number">2.1</span> What is an R Project?</h2>
+<section id="what-is-an-r-project" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="what-is-an-r-project"><span class="header-section-number">3.1</span> What is an R Project?</h2>
 <p>An R Studio Project, quite simply, is a folder/directory in which you can store all of the materials associated with an R-based project, such as your raw data, your scripts, outputs (i.e.&nbsp;visualizations, processed data etc.), and reports. For each of these project components, you should create dedicated sub-directories within the main R Project directory, so your R Project directory should look something like this:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -155,8 +161,8 @@ Figure&nbsp;1: R Project Directory
 </div>
 <p>Note the <code>.Rproj</code> file within the directory. It is this file that defines a directory as an R Project directory that functions as a self-contained workspace for a given project. File paths within an R Project can be defined in relative terms with respect to this main project directory (i.e.&nbsp;the directory which has the <code>.Rproj</code> file, a point we’ll return to below.</p>
 </section>
-<section id="what-are-the-benefits-of-using-r-projects" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="what-are-the-benefits-of-using-r-projects"><span class="header-section-number">2.2</span> What are the benefits of using R Projects?</h2>
+<section id="what-are-the-benefits-of-using-r-projects" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="what-are-the-benefits-of-using-r-projects"><span class="header-section-number">3.2</span> What are the benefits of using R Projects?</h2>
 <p>One of the primary benefits of an R Project is that it creates a standard working directory. When you create an R project, and subsequently use it as a container for your project files, R automatically sets the working directory to the root folder of the project, ensuring that relative paths work consistently and reliably regardless of where in the folder your scripts or files are located. In other words, this feature allows you to not worry about managing file directories; everything in the project file can be referenced in your script with respect to the root directory of the project (i.e.&nbsp;the project’s top-level directory that contains the <code>.Rproj</code> file). Let’s say, for example, that your project directory looks like the one above, in Figure 1.</p>
 <p>First, note the <strong>.Rproj</strong> file within the directory, which indicates that this directory (<strong>r-crash-course-class-example</strong>) is the root directory of an R project. Let’s say, for the sake of argument, that you are storing your scripts in the <strong>scripts</strong> sub-directory, and your raw data in the <strong>raw_data</strong> sub-directory. Because the working directory is standardized to be the root directory of the project, we can refer to data living in the <strong>data</strong> folder within a script in the <strong>scripts</strong> sub-directory using a relative path that originates from the project’s root directory. So, for example, assuming the <strong>raw_data</strong> folder contains two subdirectories, <strong>pt</strong> (which contains <code>persson_tabellini_workshop.csv</code>) and <strong>wb</strong>, we could read in the Persson-Tabellini data with <code>read_csv("raw_data/pt/persson_tabellini_workshop.csv</code>. If we weren’t working within an R Project environment, this would not be possible.</p>
 <p>The standardization of the working directory makes project management more convenient, and also enables sharing. For example, if you needed to share your work with a collaborator, you could zip up the R Project directory and send it to them. When they run your scripts, everything should work as they did on your own computer even though their directory structure is different, since all the file paths are defined in relative terms with respect to the root of the project directory. In addition, GitHub recognizes <strong>.RProj</strong> files, which allows you to push an R project directory and its components to GitHub. When a collaborator clones the repository to their local machine, they will be able to run your scripts (since it’s set to the project root and all file paths are relative to it), add to your scripts, and push the changes back up to GitHub. When you update your local repository, everything should continue to work seamlessly.</p>
@@ -165,8 +171,8 @@ Figure&nbsp;1: R Project Directory
 <p>Finally, working within a project allows for more effective and organized file management. Instead of dispersing relevant files and directories across your computer, which makes it difficult to keep track of everything, a project allows us to create sub-directories for scripts, data, results, and documents and reports that are centrally located and easy to find.</p>
 <p>In short, R Projects offer meaningful benefits in the realm of project and data management, and facilitate sharing, collaboration, and reproducibility.</p>
 </section>
-<section id="how-do-you-initiate-an-r-project" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="how-do-you-initiate-an-r-project"><span class="header-section-number">2.3</span> How do you initiate an R Project?</h2>
+<section id="how-do-you-initiate-an-r-project" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="how-do-you-initiate-an-r-project"><span class="header-section-number">3.3</span> How do you initiate an R Project?</h2>
 <p>To start an R Project, first go to <strong>File</strong> and click <strong>New Project</strong>:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -249,12 +255,12 @@ Figure&nbsp;6: Project Options Menu
 <p>You can explore the various options, but it’s generally recommended to set all of the workspace options to “No”, especially if you are working on a research project that will ultimately be shared and published. <strong>.RData</strong> is a binary file that R uses to save your workspace (which includes all of the R objects you create) across multiple sessions. Hadley Wickham, a leading R developer (particularly on the <em>tidyverse</em> suite we’ve been using extensively the past few days), recommends avoiding .RData, and saving all of your work in reproducible scripts that can precisely regenerate all of your work. Using scripts, rather than .RData, to keep track of your objects and work (and regenerate them as necessary) will make your work more reproducible, since it reduces the likelihood that you unknowingly carry over old objects into new work and create hidden dependencies in your code ( by relying on objects from a previous session that were not explicitly created in your current script). In addition, carrying over the workspace session to session may end up leading to a cluttered environment, with a lot of superfluous objects you can’t keep track of. In short, you will generally be best-served by relying on well-documented scripts, rather than <strong>.RData</strong> to track your work and restore your environment after closing a session; using <strong>.RData</strong> to save your workspace could be more convenient in the short run, but will likely be more painful in the long run.</p>
 </section>
 </section>
-<section id="quarto" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Quarto</h1>
+<section id="quarto" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Quarto</h1>
 <p>Quarto is an open source publishing system that allows us to create a variety of outputs (such as reports, presentations, websites, and dashboards) that facilitate research related communications with a variety of audiences, including colleagues, collaborators and co-authors, students, and the public. It is compatible with a variety of programming languages, including R.</p>
 <p>One of the many benefits of Quarto is that it enables <em>literate programming</em>, a concept developed by the computer scientist Donald Knuth. Literate programming is a practice in which the authors of code embed their code in human-readable documents that also contain narrative exposition of the code, and the actual outputs of the code, so that others can clearly understanding how the different parts of an analysis fit together. Among other things, literate programming facilitates transparency and clarity when communicating about the scripts used to generate research results. The lesson plans we’ve used in this workshop work within the literate programming paradigm, to the extent that it combines narrative text, blocks of code, and code outputs into an integrated document. Below, we’ll learn how to create simple literate programming documents using Quarto.</p>
-<section id="making-a-new-quarto-document" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="making-a-new-quarto-document"><span class="header-section-number">3.1</span> Making a New Quarto Document</h2>
+<section id="making-a-new-quarto-document" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="making-a-new-quarto-document"><span class="header-section-number">4.1</span> Making a New Quarto Document</h2>
 <p>To start a new Quarto Document, open up R Studio, then click <strong>New File</strong>, then select <strong>Quarto Document</strong>:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -302,8 +308,8 @@ Figure&nbsp;9: Create New Quarto Document
 </div>
 <p>The document comes prepopulated with some text that can serve as a useful guide to some relevant syntax.</p>
 </section>
-<section id="writing-the-document" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="writing-the-document"><span class="header-section-number">3.2</span> Writing the Document</h2>
+<section id="writing-the-document" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="writing-the-document"><span class="header-section-number">4.2</span> Writing the Document</h2>
 <p>A Quarto document is comprised of three main elements. First, there is the YAML header, which contains metadata for the entire document, and allows us to define document settings and set rules for how the document will behave. Among many other things, we can use the YAML header to specify the desired output type (i.e.&nbsp;html, pdf, word), and define a table of contents. For example, see the YAML header associated for the first lesson plan we worked through on the first day of the workshop:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -382,8 +388,8 @@ Figure&nbsp;14: Output of Code Chunk
 </div>
 <p>There are various ways to customize your code blocks and specify their behavior. For example, you can hide code blocks so that only the output is shown; you can also create code blocks that don’t execute, so that the final report shows the code block without the output; you can suppress code warnings; and so on. For more information on the relevant syntax needed to customize code chunks in these (and other) ways, see this <a href="https://quarto.org/docs/computations/execution-options.html">guide to Quarto</a>.</p>
 </section>
-<section id="rendering-the-document" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="rendering-the-document"><span class="header-section-number">3.3</span> Rendering the Document</h2>
+<section id="rendering-the-document" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="rendering-the-document"><span class="header-section-number">4.3</span> Rendering the Document</h2>
 <p>Let’s go ahead and modify the document; we’ll delete the pre-populated text, and add our own heading, as well as another code chunk. The document looks something like this:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -447,8 +453,8 @@ Figure&nbsp;18: Preview
 <p>Note that after rendering, an html file will also be created in the same directory as your .qmd file, and will update each time you render the .qmd file by clicking the <strong>Render</strong> button.</p>
 </section>
 </section>
-<section id="r-projects-quarto-and-the-here-package" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> R Projects, Quarto, and the <em>here()</em> package</h1>
+<section id="r-projects-quarto-and-the-here-package" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> R Projects, Quarto, and the <em>here()</em> package</h1>
 <p>R Projects and Quarto are two essential R tools that enable data management, sharing, and communication, both with the scholarly community and the public. Though we’ve introduced these tools separately, it’s likely you’ll want to use them in conjunction (for instance, by placing your Quarto files and rendered documents within the <strong>reports-documents</strong> subdirectory of your R Project directory). Indeed, we’ve already taken a step in this direction above, when we placed our <strong>.qmd</strong> file within the <strong>reports-documents</strong> subdirectory of our R Project directory.</p>
 <p>As we discussed above, the R Project environment is a self-contained directory, where file paths can be set relative to the project’s root directory (i.e.&nbsp;the highest-level directory within the R project, which contains the <strong>.RProj</strong> file). When working with Quarto, the program automatically sets the root directory for the code that’s executed within the document to the same location as the <strong>.qmd</strong> file. When Quarto files are in an R Project, the working directory set by the location of the Quarto file overrides the working directory set by the R Project. More specifically, if the .qmd file is in the <strong>documents-reports</strong> directory (as it is here), it will set that as its root directory; as a result, it would be impossible to access the data (in the <strong>raw_data</strong> folder) from the Quarto document using a relative path.</p>
 <p>To make this more concrete, let’s first note the directory structure of the R Project root directory:</p>
@@ -567,15 +573,15 @@ Figure&nbsp;24: Rendering works when using here() to set working directory withi
 <li><p>In order to force Quarto to use the root directory of the R Project as the working directory, we can use the <code>here()</code> function. By calling the <code>here()</code> function within a code block right before reading in data, and using it to set your working directory, you can read in the data using a file path that is defined with respect to the root of the R Project directory, rather one that is defined with respect to the directory in which the <strong>.qmd</strong> file is located.</p></li>
 </ol>
 </section>
-<section id="exercises" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Exercises</h1>
+<section id="exercises" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Exercises</h1>
 <p><em>Question 1</em></p>
 <p>Create a new R Project that will serve as a “practice” workspace for you to continue practicing your R skills going forward, with the directory structure recommended earlier. In the Project, you may wish to add the scripts and data from our workshops. Check to make sure your scripts use relative paths with respect to the root project directory, and are able to run successfully. As you continue to practice R, you can add new scripts and data to this R Project, and keep all of your practice and skill-development work in one place.</p>
 <p><em>Question 2</em></p>
 <p>Create a new Quarto document, and use it to present the relevant code and output from previous practice exercises. Make sure to comment your code, and render the completed file as an html document.</p>
 </section>
-<section id="further-reading" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Further Reading</h1>
+<section id="further-reading" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Further Reading</h1>
 <p>For more on Quarto, please see this <a href="https://quarto-tdg.org">guide</a>. More generally, if you wish to continue learning R, the best resource is the online book <a href="https://r4ds.hadley.nz">R for Data Science</a>. Please reach out to me if there are particular things you’d like to learn, and are looking for more tailored resources.</p>
 </section>
 
