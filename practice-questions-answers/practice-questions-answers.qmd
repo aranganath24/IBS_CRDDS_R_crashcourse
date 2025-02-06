@@ -1,0 +1,12 @@
+---
+title: "Suggested Answers to Practice Questions"
+author: "Aditya Ranganath"
+format: html
+editor: visual
+---
+
+# Introduction
+
+Below, we present suggested answers to the practice questions. Please note that in many cases, there is more than one way to approach a given question, and the suggested solution may not be the only (or even best) solution.
+
+# Lesson 1
