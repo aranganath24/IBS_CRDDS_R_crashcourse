@@ -9,5 +9,5 @@ The individual lesson plans can be accessed through the following links:
 * [Lesson 4](https://aranganath24.github.io/IBS_CRDDS_R_crashcourse/session4/session4.html)
 * [Lesson 5](https://aranganath24.github.io/IBS_CRDDS_R_crashcourse/session5/session5.html)
 
-Each of the lessons has some suggested practice exercises; after attempting those exercises, please check your
+Each of the lessons has some suggested practice exercises; after attempting those exercises, participants are encouraged to check their
 work by [consulting the suggested solutions to the practice problems](https://aranganath24.github.io/IBS_CRDDS_R_crashcourse/practice-questions-answers/practice-questions-answers.html). 
