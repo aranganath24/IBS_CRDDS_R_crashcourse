@@ -1,7 +1,13 @@
 ---
 title: "Suggested Answers to Practice Questions"
 author: "Aditya Ranganath"
-format: html
+format: 
+  html:
+    toc: true 
+    toc-depth: 2
+    toc-expand: 2
+    number-sections: true
+    number-depth: 3
 editor: visual
 ---
 
@@ -9,8 +15,14 @@ editor: visual
 
 Below, we present suggested answers to the practice exercise. Please note that in many cases, there is more than one way to approach a given exercise, and the suggested solution may not be the only (or even best) solution.
 
+In order to complete the exercises, you'll want to make sure the following libraries are loaded:
+
 ```{r}
+#| results: false
+#| warning: false
+# load libraries
 library(tidyverse)
+library(psych)
 ```
 
 # Lesson 1
@@ -249,14 +261,7 @@ Write a function that takes a dataset as an input argument, and returns a table 
 
 ***Suggested Answer to Exercise 1***
 
-First, we'll load the *psych* package, since we'll use its `describe()` function to create the initial summary statistics table.
-
-```{r}
-# load psych library
-library(psych)
-```
-
-Now, we'll write a function that takes a dataset as an input argument, and then generates summary statistics for that dataset using the `describe()` function, with an additional column for the number of NA values associated with each variable appended to the default dataset created by `describe()`. The function below, takes an input dataset, and then creates a new column within the summary statistics table using the `mutate()` function. This new column is populated with a vector that contains the number of NA values for each column in the dataset. This vector, in turn, is created by using the `map_dbl()` function to iteratively apply a simple function that calculates the number of missing values in a vector (which is defined here within the main function, `count_missing()`) to all of the columns in the input dataset. The function then returns this modified dataset, with a new column indicating the number of NA values for each variable, as its output.
+Let's write a function that takes a dataset as an input argument, and then generates summary statistics for that dataset using the `describe()` function (from the *psych* package), with an additional column for the number of NA values associated with each variable appended to the default dataset created by `describe()`. The function below, takes an input dataset, and then creates a new column within the summary statistics table using the `mutate()` function. This new column is populated with a vector that contains the number of NA values for each column in the dataset. This vector, in turn, is created by using the `map_dbl()` function to iteratively apply a simple function that calculates the number of missing values in a vector (which is defined here within the main function, `count_missing()`) to all of the columns in the input dataset. The function then returns this modified dataset, with a new column indicating the number of NA values for each variable, as its output.
 
 ```{r}
 summary_stats_na<-function(dataset_input){
