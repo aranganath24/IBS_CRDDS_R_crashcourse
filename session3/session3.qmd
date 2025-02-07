@@ -1125,8 +1125,8 @@ Write a function that takes a dataset as an input argument, and returns a table 
 
 *Exercise 2*
 
-Earlier, we used the following to drop rows in the `student_scores` dataset that have NA values associated with the "Age" variable. Rewrite that code using the `%>%` operator.
+Earlier, we used the following to drop rows in the `student_scores` dataset that have NA values associated with the "Age" variable: `drop_na(student_scores, Age)`. Rewrite that code using the `%>%` operator.
 
 *Exercise* 3
 
-Apply the `filter()` AND the `select()` function to one of the datasets we've worked with in this lesson (chaining together operations with the `%>%` operator, and assign the modified dataset to a new object that you write out to a local directory on your computer as a CSV file.
+Apply the `filter()` AND the `select()` function to one of the datasets we've worked with in this lesson (chaining together operations with the `%>%` operator), and assign the modified dataset to a new object that you write out to a local directory on your computer as a CSV file.

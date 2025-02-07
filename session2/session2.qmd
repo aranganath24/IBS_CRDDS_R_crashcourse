@@ -714,7 +714,7 @@ Write a function that takes a monetary value (in US dollars) as an input, and re
 
 *Question 2*
 
-Write a function that takes a monetary value (in US Dollars) as an input, as well as an argument in which the user can tell the function to convert that value to an equivalent amount in Euros, Indian Rupees, or Mexican Pesos. The function returns the US dollar equivalent in the desired currency. Assign this function to a new object
+Write a function that takes a monetary value (in US Dollars) as an input, as well as an argument in which the user can tell the function to convert that value to an equivalent amount in Euros, Indian Rupees, or Mexican Pesos. The function returns the US dollar equivalent in the desired currency. Assign this function to a new object.
 
 *Question 3*
 

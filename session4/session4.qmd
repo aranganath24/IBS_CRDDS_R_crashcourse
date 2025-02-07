@@ -915,8 +915,8 @@ Check your directory to ensure that the "workshop_visualizations.pdf" file has b
 
 *Exercise 1*
 
-Create a visualization using *ggplot2* using either the Persson-Tabellini dataset, one of the World Bank datasets, or a dataset of your choice and export it out of R as a PDF file.
+Create a visualization with the *ggplot2* package using either the Persson-Tabellini dataset, one (or some combination) of the World Bank datasets, or a dataset of your choice and export it out of R as a PDF file.
 
 *Exercise 2*
 
-Write a function to perform some action(s) on one of the World Bank datasets, then iteratively apply that function to all of the World Bank datasets. Write out the transformed files to a local directory on your computer.
+Write a function to perform some operation(s) on one of the World Bank datasets, then iteratively apply that function to all of the World Bank datasets. Write out the transformed files to a local directory on your computer.

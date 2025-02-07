@@ -952,7 +952,7 @@ We could carry out the inverse operation (i.e. transforming an object of the "da
 
 # Exercises
 
-*Question 1*
+***Question 1***
 
 Consider the following vector of Fahrenheit temperature values:
 
@@ -962,111 +962,26 @@ fahrenheit_colorado<-c(33, 15, 22, 44)
 
 The first temperature is associated with Boulder; the second with Fort Collins; the third with Denver; and the fourth with Colorado Springs. Assign cities as labels to the temperature values with which they're associated, and update `fahrenheit_colorado` with these changes.
 
-```{r}
-# assigns names to "fahrenheit_colorado" using the "names" function and a vector of names
-names(fahrenheit_colorado)<-c("Boulder", "Fort Collins", "Denver", "Colorado Springs")
-```
-
-```{r}
-# prints labeled "fahrenheit_colorado" vector
-fahrenheit_colorado
-```
-
-*Question 2*
+***Question 2***
 
 Apply a transformation to `fahrenheit_colorado` that converts the temperature values to Celsius, and assign this new vector of Celsius temperatures to a new object named `celsius_colorado`.
 
-```{r}
-# applies Fahrenheit to Celsius conversion formula to "fahrenheit_colorado" and assigns resulting vector of Celsius values to a new object named "celsius_colorado"
-celsius_colorado<-(fahrenheit_colorado-32)*5/9
-```
-
-```{r}
-# prints contents of "celsius_colorado"
-celsius_colorado
-```
-
-*Question 3*
+***Question 3***
 
 Transform the class of the updated `celsius_colorado` object into "data.frame", and assign the new data frame to an object named `celsius_colorado_df.`
 
-```{r}
-# uses "as.data.frame" function to transform "celsius_colorado" into a data.frame object, and assigns the data frame to a new object named "celsius_colorado_df"
-celsius_colorado_df<-as.data.frame(celsius_colorado)
-```
-
-```{r}
-# prints contents of "celsius_colorado_df"
-celsius_colorado_df
-```
-
-*Question 4*
+***Question 4***
 
 Consider our toy country-level data frame, which is reproduced below:
 
-```{r}
-#| echo: false
-# makes toy country-level data frame
-country_df<-data.frame(Country=c("Country A", "Country B", "Country C"),
-                       GDP=c(8000, 30000, 23500),
-                       Population=c(2000, 5400, 10000),
-                       Continent=c("South America", "Europe", "North America"))
-
-# prints contents of country_df
-country_df
-```
-
 A). What is the class of the "Continent" Column?
-
-```{r}
-# extracts class of "Continent" column
-class(country_df$Continent)
-```
 
 B). Extract the "Population" column into a new object. What is it's class? Convert it to the "data.frame" class.
 
-```{r}
-# extracts "Population" column into a new object named "country_df_population"
-country_df_population<-country_df$Population
-
-# prints class of "country_df_population"
-class(country_df_population)
-
-# converts "country_df_population" to a data.frame
-country_df_population<-as.data.frame(country_df_population)
-```
-
 C. Extract the first three columns of `country_df` and assign this subsetted data frame to a new object. View it in the R Studio data viewer.
-
-```{r}
-# extracts first three columns of "country_df_columns" and assigns it to a new object named "country_df_columns"
-country_df_columns<-country_df[, 1:3]
-
-# prints "country_df_columns", pass object to View() function to see it in the data viewer
-country_df_columns
-```
 
 D. Extract the value of Country B's population using indexing.
 
-```{r}
-# extracts Country B's population (2nd row, 3rd column)
-country_df[2,3]
-```
-
-*Question 5*
+***Question 5***
 
 Deposit `fahrenheit_colorado,` `celsius_colorado` , and `country_df` into a new list object. After you have done so, extract `country_df` from the list using index numbers and bracket notation. Then, assign the list elements names of your choosing, and extract the `celsius_colorado` list object using its name and bracket notation.
-
-```{r}
-# makes a list with the relevant elements and assigns it to a new object named "exercise_list"
-exercise_list<-list(fahrenheit_colorado, celsius_colorado, country_df)
-
-# extracts "country_df" from list using its index
-country_df[[3]]
-
-# assigns names to "exercise_list"
-names(exercise_list)<-c("CO_F", "CO_C", "ToyDF")
-
-# extracts data frame using its list label
-exercise_list[["ToyDF"]]
-```
